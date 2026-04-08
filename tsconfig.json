@@ -1,0 +1,39 @@
+-- Run this in your Supabase SQL Editor
+
+create table if not exists recipes (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  category text not null,
+  prep_time text,
+  cook_time text,
+  servings text,
+  all_ingredients jsonb not null default '[]',
+  steps jsonb not null default '[]',
+  created_at timestamptz default now()
+);
+
+-- Enable row level security
+alter table recipes enable row level security;
+
+-- Anyone can read recipes
+create policy "Public can read recipes"
+  on recipes for select
+  using (true);
+
+-- Only authenticated users can insert
+create policy "Authenticated users can insert"
+  on recipes for insert
+  to authenticated
+  with check (true);
+
+-- Only authenticated users can update
+create policy "Authenticated users can update"
+  on recipes for update
+  to authenticated
+  using (true);
+
+-- Only authenticated users can delete
+create policy "Authenticated users can delete"
+  on recipes for delete
+  to authenticated
+  using (true);
