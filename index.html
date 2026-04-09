@@ -17,8 +17,23 @@ nav{border-bottom:1px solid var(--border);background:var(--cream);position:stick
 .nav-right{display:flex;align-items:center;gap:16px}
 .btn-pill{background:var(--accent);color:#fff;border:none;border-radius:99px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
 .btn-pill:hover{background:#a8501f}
-.btn-login{background:none;border:1px solid var(--border);border-radius:99px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink)}
+.sug-card{border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px;background:var(--white)}
+.sug-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sug-recipe-title{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:4px}
+.sug-from{font-size:12px;color:var(--muted)}
+.sug-notes-text{font-size:13px;color:var(--muted);margin-top:6px;font-style:italic}
+.sug-actions{display:flex;gap:8px;flex-shrink:0}
+.sug-accept{background:var(--accent);color:#fff;border:none;border-radius:99px;padding:5px 14px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.sug-accept:hover{background:#a8501f}
+.sug-dismiss{background:none;border:1px solid var(--border);border-radius:99px;padding:5px 14px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--muted)}
+.sug-dismiss:hover{border-color:#fca5a5;color:#f87171}
+.time-h{width:64px!important;text-align:center}
+.time-m{width:64px!important;text-align:center}
+.time-sep{font-size:13px;color:var(--muted);font-weight:500}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{opacity:1}border:1px solid var(--border);border-radius:99px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink)}
 .btn-login:hover{border-color:var(--accent);color:var(--accent)}
+.btn-edit{background:none;border:1px solid var(--border);border-radius:99px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink);flex-shrink:0}
+.btn-edit:hover{border-color:var(--accent);color:var(--accent)}
 .page{display:none}
 .page.active{display:block}
 main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
@@ -147,7 +162,10 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
 
 <div id="page-recipe" class="page">
   <div class="narrow">
-    <button class="back-btn" id="rbk">← Back</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <button class="back-btn" id="rbk" style="margin-bottom:0">← Back</button>
+      <button class="btn-edit" id="edit-btn" style="display:none" onclick="openEdit()">Edit recipe</button>
+    </div>
     <h1 class="recipe-title" id="rt"></h1>
     <div class="recipe-meta" id="rm" style="margin-bottom:32px"></div>
     <hr class="divider"/>
@@ -158,6 +176,39 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
     <div class="sec-title">Recipe</div>
     <hr class="divider" style="margin-top:0"/>
     <div id="rs"></div>
+  </div>
+</div>
+
+<div id="page-edit" class="page">
+  <div class="add-wrap">
+    <h1>Edit recipe</h1>
+    <p class="sub">Update the recipe details below.</p>
+    <div class="slabel">Recipe info</div>
+    <div class="card">
+      <div class="fgroup"><label class="flabel">Recipe title</label><input class="finput" type="text" id="e-title" placeholder="e.g. French Bread"/></div>
+      <div class="fgroup"><label class="flabel">Category</label>
+        <select class="fselect" id="e-cat">
+          <option value="">Select a category</option>
+          <option>Breakfast</option><option>Sides</option><option>Lunch</option>
+          <option>Entrees</option><option>Breads &amp; Baked</option><option>Sauces &amp; Marinades</option><option>Desserts</option>
+        </select>
+      </div>
+      <div class="g3">
+        <div class="fgroup"><label class="flabel">Prep time</label><div class="time-input"><input class="finput time-h" type="number" id="e-prep-h" min="0" max="23" placeholder="00"/><span class="time-sep">H</span><input class="finput time-m" type="number" id="e-prep-m" min="0" max="59" placeholder="00"/><span class="time-sep">M</span></div></div>
+        <div class="fgroup"><label class="flabel">Cook time</label><div class="time-input"><input class="finput time-h" type="number" id="e-cook-h" min="0" max="23" placeholder="00"/><span class="time-sep">H</span><input class="finput time-m" type="number" id="e-cook-m" min="0" max="59" placeholder="00"/><span class="time-sep">M</span></div></div>
+        <div class="fgroup"><label class="flabel">Servings</label><input class="finput" type="text" id="e-serv" placeholder="2 loaves"/></div>
+      </div>
+    </div>
+    <div class="slabel" style="margin-top:24px">All ingredients</div>
+    <div class="card"><div id="emil"></div><button class="addbtn" onclick="addEMI()">+ Add ingredient</button></div>
+    <div class="slabel" style="margin-top:24px">Recipe steps</div>
+    <div id="esc2"></div>
+    <button class="add-step-btn" onclick="addEStep()">+ Add step</button>
+    <div class="errmsg" id="eerr"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <button class="save-btn" style="background:var(--cream);color:var(--ink);border:1px solid var(--border)" onclick="cancelEdit()">Cancel</button>
+      <button class="save-btn" id="ubtn" onclick="updateRecipe()">Save changes</button>
+    </div>
   </div>
 </div>
 
@@ -172,6 +223,20 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
   </div>
 </div>
 
+<div id="page-suggest" class="page">
+  <div class="login-wrap" style="max-width:480px">
+    <button class="back-btn" onclick="showPage('home')">← Back</button>
+    <h1>Suggest a recipe</h1>
+    <p>Have a recipe you'd love to see added? Send it over!</p>
+    <div class="fgroup"><label class="flabel">Your name (optional)</label><input class="finput" type="text" id="sug-name" placeholder="e.g. Sarah"/></div>
+    <div class="fgroup"><label class="flabel">Recipe name</label><input class="finput" type="text" id="sug-title" placeholder="e.g. Chicken Tikka Masala"/></div>
+    <div class="fgroup"><label class="flabel">Notes or link (optional)</label><textarea class="finput" id="sug-notes" rows="3" placeholder="Any details, a link, or just a general idea..." style="resize:vertical"></textarea></div>
+    <div class="errmsg" id="sug-err"></div>
+    <div id="sug-success" style="display:none;color:#16a34a;font-size:14px;margin-bottom:12px">Thanks! Your suggestion was sent ✓</div>
+    <button class="btn-primary" id="sug-btn" onclick="submitSuggestion()">Send suggestion</button>
+  </div>
+</div>
+
 <div id="page-add" class="page">
   <div class="add-wrap">
     <h1>Add recipe</h1>
@@ -183,12 +248,12 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
         <select class="fselect" id="r-cat">
           <option value="">Select a category</option>
           <option>Breakfast</option><option>Sides</option><option>Lunch</option>
-          <option>Entrees</option><option>Breads &amp; Baked</option><option>Desserts</option>
+          <option>Entrees</option><option>Breads &amp; Baked</option><option>Sauces &amp; Marinades</option><option>Desserts</option>
         </select>
       </div>
       <div class="g3">
-        <div class="fgroup"><label class="flabel">Prep time</label><input class="finput" type="text" id="r-prep" placeholder="20 minutes"/></div>
-        <div class="fgroup"><label class="flabel">Cook time</label><input class="finput" type="text" id="r-cook" placeholder="25 minutes"/></div>
+        <div class="fgroup"><label class="flabel">Prep time</label><div class="time-input"><input class="finput time-h" type="number" id="r-prep-h" min="0" max="23" placeholder="00"/><span class="time-sep">H</span><input class="finput time-m" type="number" id="r-prep-m" min="0" max="59" placeholder="00"/><span class="time-sep">M</span></div></div>
+        <div class="fgroup"><label class="flabel">Cook time</label><div class="time-input"><input class="finput time-h" type="number" id="r-cook-h" min="0" max="23" placeholder="00"/><span class="time-sep">H</span><input class="finput time-m" type="number" id="r-cook-m" min="0" max="59" placeholder="00"/><span class="time-sep">M</span></div></div>
         <div class="fgroup"><label class="flabel">Servings</label><input class="finput" type="text" id="r-serv" placeholder="2 loaves"/></div>
       </div>
     </div>
@@ -199,6 +264,14 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
     <button class="add-step-btn" onclick="addStep()">+ Add step</button>
     <div class="errmsg" id="serr"></div>
     <button class="save-btn" id="sbtn" onclick="saveRecipe()">Save recipe</button>
+
+    <div style="margin-top:48px;padding-top:32px;border-top:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <p class="slabel" style="margin-bottom:0">Pending suggestions</p>
+        <button class="btn-login" onclick="loadSuggestions()" style="font-size:12px;padding:4px 12px">Refresh</button>
+      </div>
+      <div id="sug-list"><p style="font-size:14px;color:var(--muted)">Loading...</p></div>
+    </div>
   </div>
 </div>
 
@@ -209,10 +282,12 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let user = null, curCat = null, stepCount = 0;
 let masterIngs = [], steps = [];
+let currentRecipeId=null, currentRecipeCat=null, currentRecipePrepTime=null, currentRecipeCookTime=null, currentRecipeServings=null, currentRecipeIngs=[], currentRecipeSteps=[];
 
 const CATS = {
   'Breakfast':{'icon':'🍳'},'Sides':{'icon':'🥗'},'Lunch':{'icon':'🥪'},
-  'Entrees':{'icon':'🍽️'},'Breads & Baked':{'icon':'🍞'},'Desserts':{'icon':'🍰'}
+  'Entrees':{'icon':'🍽️'},'Breads & Baked':{'icon':'🍞'},
+  'Sauces & Marinades':{'icon':'🫙'},'Desserts':{'icon':'🍰'}
 };
 
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
@@ -222,6 +297,7 @@ function showPage(name){
   document.getElementById('page-'+name).classList.add('active');
   window.scrollTo(0,0);
   if(name==='home') loadHome();
+  if(name==='add' && user) loadSuggestions();
 }
 
 async function initAuth(){
@@ -234,7 +310,7 @@ function renderNav(){
   const nr = document.getElementById('nav-right');
   nr.innerHTML = user
     ? `<button class="btn-pill" onclick="resetForm();showPage('add')">+ Add Recipe</button><button class="btn-ghost" onclick="doSignOut()">Sign out</button>`
-    : `<button class="btn-login" onclick="showPage('login')">Admin login</button>`;
+    : `<button class="btn-login" onclick="showPage('suggest')" style="margin-right:4px">Suggest a recipe</button><button class="btn-login" onclick="showPage('login')">Admin login</button>`;
 }
 
 async function doLogin(){
@@ -288,9 +364,18 @@ async function loadCat(name){
 async function loadRecipe(id, fromCat){
   const {data:r} = await sb.from('recipes').select('*').eq('id',id).single();
   if(!r) return;
+  currentRecipeId=id;
+  currentRecipeCat=r.category;
+  currentRecipePrepTime=r.prep_time;
+  currentRecipeCookTime=r.cook_time;
+  currentRecipeServings=r.servings;
+  currentRecipeIngs=[...(r.all_ingredients||[])];
+  currentRecipeSteps=(r.steps||[]).map((s,i)=>({...s,id:i+1}));
   const rbk=document.getElementById('rbk');
   rbk.textContent=`← ${fromCat||r.category}`;
   rbk.onclick=()=>fromCat?loadCat(fromCat):showPage('home');
+  const editBtn=document.getElementById('edit-btn');
+  editBtn.style.display=user?'block':'none';
   document.getElementById('rt').textContent=r.title;
   const meta=[];
   if(r.prep_time) meta.push(`<p><strong>Prep Time:</strong> ${esc(r.prep_time)}</p>`);
@@ -310,8 +395,10 @@ async function loadRecipe(id, fromCat){
 function resetForm(){
   document.getElementById('r-title').value='';
   document.getElementById('r-cat').value='';
-  document.getElementById('r-prep').value='';
-  document.getElementById('r-cook').value='';
+  document.getElementById('r-prep-h').value='';
+  document.getElementById('r-prep-m').value='';
+  document.getElementById('r-cook-h').value='';
+  document.getElementById('r-cook-m').value='';
   document.getElementById('r-serv').value='';
   document.getElementById('serr').textContent='';
   masterIngs=['','']; steps=[]; stepCount=0;
@@ -431,8 +518,8 @@ async function saveRecipe(){
   btn.disabled=true; btn.textContent='Saving...';
   const {data,error} = await sb.from('recipes').insert({
     title:title.toUpperCase(), category,
-    prep_time:document.getElementById('r-prep').value.trim(),
-    cook_time:document.getElementById('r-cook').value.trim(),
+    prep_time:buildTime(document.getElementById('r-prep-h').value, document.getElementById('r-prep-m').value),
+    cook_time:buildTime(document.getElementById('r-cook-h').value, document.getElementById('r-cook-m').value),
     servings:document.getElementById('r-serv').value.trim(),
     all_ingredients:filled,
     steps:steps.map(s=>({title:s.title.trim(),ingredients:s.ingredients.filter(i=>i.trim()),instructions:s.instructions.filter(i=>i.trim())}))
@@ -440,6 +527,222 @@ async function saveRecipe(){
   btn.disabled=false; btn.textContent='Save recipe';
   if(error){err.textContent=error.message;return}
   loadRecipe(data.id, category);
+}
+
+// ── TIME HELPERS ──────────────────────────────────────────────────────────────
+function buildTime(h,m){
+  const hv=parseInt(h)||0, mv=parseInt(m)||0;
+  if(!hv&&!mv) return '';
+  if(hv&&mv) return `${hv} hr ${mv} min`;
+  if(hv) return `${hv} hr`;
+  return `${mv} min`;
+}
+function parseTime(str){
+  if(!str) return {h:0,m:0};
+  const h=str.match(/(\d+)\s*hr/); const m=str.match(/(\d+)\s*min/);
+  return {h:h?parseInt(h[1]):0, m:m?parseInt(m[1]):0};
+}
+
+// ── SUGGEST ───────────────────────────────────────────────────────────────────
+async function submitSuggestion(){
+  const err=document.getElementById('sug-err');
+  err.textContent='';
+  const name=document.getElementById('sug-name').value.trim();
+  const title=document.getElementById('sug-title').value.trim();
+  const notes=document.getElementById('sug-notes').value.trim();
+  if(!title) return err.textContent='Please enter a recipe name';
+  const btn=document.getElementById('sug-btn');
+  btn.disabled=true; btn.textContent='Sending...';
+  const {error} = await sb.from('suggestions').insert({name,title,notes,status:'pending'});
+  btn.disabled=false; btn.textContent='Send suggestion';
+  if(error){err.textContent=error.message;return}
+  document.getElementById('sug-name').value='';
+  document.getElementById('sug-title').value='';
+  document.getElementById('sug-notes').value='';
+  document.getElementById('sug-success').style.display='block';
+  setTimeout(()=>{document.getElementById('sug-success').style.display='none'},3000);
+}
+
+async function loadSuggestions(){
+  const {data} = await sb.from('suggestions').select('*').eq('status','pending').order('created_at',{ascending:false});
+  const container=document.getElementById('sug-list');
+  if(!data||!data.length){
+    container.innerHTML='<p style="font-size:14px;color:var(--muted);padding:20px 0">No pending suggestions</p>';
+    return;
+  }
+  container.innerHTML=data.map(s=>`
+    <div class="sug-card" id="sugc-${s.id}">
+      <div class="sug-card-top">
+        <div>
+          <div class="sug-recipe-title">${esc(s.title)}</div>
+          ${s.name?`<div class="sug-from">Suggested by ${esc(s.name)}</div>`:''}
+          ${s.notes?`<div class="sug-notes-text">${esc(s.notes)}</div>`:''}
+        </div>
+        <div class="sug-actions">
+          <button class="sug-accept" onclick="acceptSuggestion('${s.id}','${esc(s.title)}','${esc(s.notes||'')}')">Accept</button>
+          <button class="sug-dismiss" onclick="dismissSuggestion('${s.id}')">Dismiss</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function dismissSuggestion(id){
+  await sb.from('suggestions').update({status:'dismissed'}).eq('id',id);
+  document.getElementById('sugc-'+id)?.remove();
+  if(!document.querySelectorAll('.sug-card').length)
+    document.getElementById('sug-list').innerHTML='<p style="font-size:14px;color:var(--muted);padding:20px 0">No pending suggestions</p>';
+}
+
+function acceptSuggestion(id, title, notes){
+  dismissSuggestion(id);
+  resetForm();
+  document.getElementById('r-title').value=title;
+  showPage('add');
+}
+
+// ── EDIT ──────────────────────────────────────────────────────────────────────
+let editId=null, editMasterIngs=[], editSteps=[], editStepCount=0, editCurCat=null;
+
+function openEdit(){
+  // copy current recipe data into edit form
+  editId=currentRecipeId; editCurCat=curCat;
+  document.getElementById('e-title').value=document.getElementById('rt').textContent.replace(/^(.+)$/,s=>s);
+  document.getElementById('e-cat').value=currentRecipeCat||'';
+  const prepParts=parseTime(currentRecipePrepTime);
+  const cookParts=parseTime(currentRecipeCookTime);
+  document.getElementById('e-prep-h').value=prepParts.h||'';
+  document.getElementById('e-prep-m').value=prepParts.m||'';
+  document.getElementById('e-cook-h').value=cookParts.h||'';
+  document.getElementById('e-cook-m').value=cookParts.m||'';
+  document.getElementById('e-serv').value=currentRecipeServings||'';
+  editMasterIngs=[...currentRecipeIngs];
+  editSteps=JSON.parse(JSON.stringify(currentRecipeSteps));
+  editStepCount=editSteps.length;
+  renderEMI(); renderESteps();
+  document.getElementById('eerr').textContent='';
+  showPage('edit');
+}
+
+function cancelEdit(){loadRecipe(editId, editCurCat)}
+
+function getEFilled(){return editMasterIngs.filter(i=>i.trim())}
+
+function renderEMI(){
+  document.getElementById('emil').innerHTML=editMasterIngs.map((v,i)=>`
+    <div class="birow"><div class="bd-a"></div>
+      <input class="binput" type="text" value="${esc(v)}" placeholder="e.g. 4½ cups bread flour"
+        oninput="editMasterIngs[${i}]=this.value;refreshEDD()" onblur="refreshEDD()"/>
+      <button class="rmx" onclick="removeEMI(${i})">×</button>
+    </div>`).join('');
+}
+function addEMI(){editMasterIngs.push('');renderEMI();document.querySelectorAll('#emil .binput').forEach((e,i)=>{if(i===editMasterIngs.length-1)e.focus()})}
+function removeEMI(i){editMasterIngs.splice(i,1);renderEMI();refreshEDD()}
+
+function refreshEDD(){
+  const filled=getEFilled();
+  document.querySelectorAll('.estep-ing-sel').forEach(sel=>{
+    const cur=sel.value;
+    sel.innerHTML=`<option value="">${filled.length?'Select ingredient':'Add ingredients above first'}</option>`
+      +filled.map(f=>`<option value="${esc(f)}"${f===cur?' selected':''}>${esc(f)}</option>`).join('');
+  });
+}
+
+function renderESteps(){
+  document.getElementById('esc2').innerHTML='';
+  editSteps.forEach(s=>renderEStep(s.id));
+}
+
+function addEStep(){
+  const id=++editStepCount;
+  editSteps.push({id,title:'',ingredients:[''],instructions:['']});
+  renderEStep(id);
+}
+
+function removeEStep(id){
+  editSteps=editSteps.filter(s=>s.id!==id);
+  document.getElementById('esc'+id)?.remove();
+  editSteps.forEach((s,i)=>{const b=document.querySelector(`#esc${s.id} .step-badge`);if(b)b.textContent=`Step ${i+1}`});
+}
+
+function renderEStep(id){
+  const idx=editSteps.findIndex(s=>s.id===id);
+  const s=editSteps[idx];
+  const div=document.createElement('div');
+  div.className='step-card'; div.id='esc'+id;
+  div.innerHTML=`
+    <div class="step-hdr">
+      <span class="step-badge">Step ${idx+1}</span>
+      <button class="rm-step" onclick="removeEStep(${id})">Remove step</button>
+    </div>
+    <div class="fgroup"><label class="flabel">Section title</label>
+      <input class="finput" type="text" value="${esc(s.title)}" placeholder="e.g. DOUGH, SAUCE, BREADING" oninput="updateEStepF(${id},'title',this.value)"/></div>
+    <hr class="sdiv"/>
+    <div class="sublabel">Ingredients used</div>
+    <div id="esi${id}"></div>
+    <button class="addbtn" onclick="addESI(${id})">+ Add ingredient</button>
+    <hr class="sdiv"/>
+    <div class="sublabel">Instructions</div>
+    <div id="esn${id}"></div>
+    <button class="addbtn" onclick="addESN(${id})">+ Add instruction</button>`;
+  document.getElementById('esc2').appendChild(div);
+  renderESI(id); renderESN(id);
+}
+
+function updateEStepF(id,f,v){const s=editSteps.find(s=>s.id===id);if(s)s[f]=v}
+
+function renderESI(id){
+  const s=editSteps.find(s=>s.id===id), c=document.getElementById('esi'+id);
+  if(!s||!c) return;
+  const filled=getEFilled();
+  c.innerHTML=s.ingredients.map((v,i)=>`
+    <div class="birow"><div class="bd-m"></div>
+      <select class="bselect estep-ing-sel" onchange="updateESI(${id},${i},this.value)">
+        <option value="">${filled.length?'Select ingredient':'Add ingredients above first'}</option>
+        ${filled.map(f=>`<option value="${esc(f)}"${f===v?' selected':''}>${esc(f)}</option>`).join('')}
+      </select>
+      <button class="rmx" onclick="removeESI(${id},${i})">×</button>
+    </div>`).join('');
+}
+function addESI(id){const s=editSteps.find(s=>s.id===id);if(s){s.ingredients.push('');renderESI(id)}}
+function removeESI(id,i){const s=editSteps.find(s=>s.id===id);if(s){s.ingredients.splice(i,1);renderESI(id)}}
+function updateESI(id,i,v){const s=editSteps.find(s=>s.id===id);if(s)s.ingredients[i]=v}
+
+function renderESN(id){
+  const s=editSteps.find(s=>s.id===id), c=document.getElementById('esn'+id);
+  if(!s||!c) return;
+  c.innerHTML=s.instructions.map((v,i)=>`
+    <div class="birow"><div class="bd-m"></div>
+      <input class="binput" type="text" value="${esc(v)}" placeholder="e.g. Mix until a smooth dough forms"
+        oninput="updateESN(${id},${i},this.value)"/>
+      <button class="rmx" onclick="removeESN(${id},${i})">×</button>
+    </div>`).join('');
+}
+function addESN(id){const s=editSteps.find(s=>s.id===id);if(s){s.instructions.push('');renderESN(id);const ins=document.querySelectorAll(`#esn${id} .binput`);ins[ins.length-1]?.focus()}}
+function removeESN(id,i){const s=editSteps.find(s=>s.id===id);if(s){s.instructions.splice(i,1);renderESN(id)}}
+function updateESN(id,i,v){const s=editSteps.find(s=>s.id===id);if(s)s.instructions[i]=v}
+
+async function updateRecipe(){
+  const err=document.getElementById('eerr');
+  err.textContent='';
+  const title=document.getElementById('e-title').value.trim();
+  const category=document.getElementById('e-cat').value;
+  const filled=getEFilled();
+  if(!title) return err.textContent='Recipe title is required';
+  if(!category) return err.textContent='Please select a category';
+  if(!filled.length) return err.textContent='Add at least one ingredient';
+  const btn=document.getElementById('ubtn');
+  btn.disabled=true; btn.textContent='Saving...';
+  const {error} = await sb.from('recipes').update({
+    title:title.toUpperCase(), category,
+    prep_time:buildTime(document.getElementById('e-prep-h').value, document.getElementById('e-prep-m').value),
+    cook_time:buildTime(document.getElementById('e-cook-h').value, document.getElementById('e-cook-m').value),
+    servings:document.getElementById('e-serv').value.trim(),
+    all_ingredients:filled,
+    steps:editSteps.map(s=>({title:s.title.trim(),ingredients:s.ingredients.filter(i=>i.trim()),instructions:s.instructions.filter(i=>i.trim())}))
+  }).eq('id',editId);
+  btn.disabled=false; btn.textContent='Save changes';
+  if(error){err.textContent=error.message;return}
+  loadRecipe(editId, category);
 }
 
 initAuth();
