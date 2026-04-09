@@ -15,9 +15,19 @@ nav{border-bottom:1px solid var(--border);background:var(--cream);position:stick
 .nav-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);text-decoration:none;cursor:pointer;background:none;border:none}
 .nav-logo:hover{color:var(--accent)}
 .nav-right{display:flex;align-items:center;gap:16px}
-.btn-pill{background:var(--accent);color:#fff;border:none;border-radius:99px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif}
-.btn-pill:hover{background:#a8501f}
-.sug-card{border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px;background:var(--white)}
+.nav-btn{font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;border-radius:8px;padding:6px 14px;border:none;transition:all .15s}
+.nav-btn-fill{background:var(--accent);color:#fff}
+.nav-btn-fill:hover{background:#a8501f}
+.nav-btn-outline{background:none;border:1px solid var(--border);color:var(--ink)}
+.nav-btn-outline:hover{border-color:var(--ink)}
+.nav-btn-ghost{background:none;color:var(--muted)}
+.nav-btn-ghost:hover{color:var(--ink)}
+.sug-row{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.sug-row:hover .sug-row-title{color:var(--accent)}
+.sug-row:hover .sug-row-arrow{opacity:1}
+.sug-row-title{font-size:15px;font-weight:500;color:var(--ink);transition:color .15s;margin-bottom:3px}
+.sug-row-sub{font-size:12px;color:var(--muted)}
+.sug-row-arrow{color:var(--accent);opacity:0;transition:opacity .15s;font-size:14px;flex-shrink:0}
 .sug-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .sug-recipe-title{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:4px}
 .sug-from{font-size:12px;color:var(--muted)}
@@ -27,13 +37,12 @@ nav{border-bottom:1px solid var(--border);background:var(--cream);position:stick
 .sug-accept:hover{background:#a8501f}
 .sug-dismiss{background:none;border:1px solid var(--border);border-radius:99px;padding:5px 14px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--muted)}
 .sug-dismiss:hover{border-color:#fca5a5;color:#f87171}
-.time-h{width:64px!important;text-align:center}
-.time-m{width:64px!important;text-align:center}
-.time-sep{font-size:13px;color:var(--muted);font-weight:500}
-input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{opacity:1}border:1px solid var(--border);border-radius:99px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink)}
-.btn-login:hover{border-color:var(--accent);color:var(--accent)}
-.btn-edit{background:none;border:1px solid var(--border);border-radius:99px;padding:6px 16px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink);flex-shrink:0}
-.btn-edit:hover{border-color:var(--accent);color:var(--accent)}
+.time-input{display:flex;align-items:center;gap:10px}.time-h{width:72px!important;text-align:center}
+.time-m{width:72px!important;text-align:center}
+.time-sep{font-size:14px;color:var(--muted);font-weight:500;padding:0 2px}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{opacity:1}
+.btn-edit{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink);flex-shrink:0}
+.btn-edit:hover{border-color:var(--ink)}
 .page{display:none}
 .page.active{display:block}
 main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
@@ -237,6 +246,25 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
   </div>
 </div>
 
+<div id="page-suggestions" class="page">
+  <main style="max-width:680px">
+    <button class="back-btn" onclick="showPage('home')">← Back</button>
+    <h1 style="font-family:'Playfair Display',serif;font-size:36px;margin-bottom:6px">Suggested recipes</h1>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:32px">Review and accept or deny submitted suggestions.</p>
+    <div id="admin-sug-list"><p style="font-size:14px;color:var(--muted)">Loading...</p></div>
+    <div id="sug-detail-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center">
+      <div style="background:var(--white);border-radius:20px;padding:32px;max-width:480px;width:90%;max-height:80vh;overflow-y:auto;position:relative">
+        <button onclick="closeSugDetail()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted)">×</button>
+        <div id="sug-detail-content"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px">
+          <button class="save-btn" style="background:var(--cream);color:var(--ink);border:1px solid var(--border)" onclick="denySuggestion()">Deny</button>
+          <button class="save-btn" id="accept-detail-btn" onclick="acceptSuggestionFromDetail()">Accept</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
 <div id="page-add" class="page">
   <div class="add-wrap">
     <h1>Add recipe</h1>
@@ -264,14 +292,8 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
     <button class="add-step-btn" onclick="addStep()">+ Add step</button>
     <div class="errmsg" id="serr"></div>
     <button class="save-btn" id="sbtn" onclick="saveRecipe()">Save recipe</button>
-
-    <div style="margin-top:48px;padding-top:32px;border-top:1px solid var(--border)">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-        <p class="slabel" style="margin-bottom:0">Pending suggestions</p>
-        <button class="btn-login" onclick="loadSuggestions()" style="font-size:12px;padding:4px 12px">Refresh</button>
-      </div>
-      <div id="sug-list"><p style="font-size:14px;color:var(--muted)">Loading...</p></div>
-    </div>
+  </div>
+</div>
   </div>
 </div>
 
@@ -297,7 +319,7 @@ function showPage(name){
   document.getElementById('page-'+name).classList.add('active');
   window.scrollTo(0,0);
   if(name==='home') loadHome();
-  if(name==='add' && user) loadSuggestions();
+  if(name==='suggestions' && user) loadAdminSuggestions();
 }
 
 async function initAuth(){
@@ -309,8 +331,8 @@ async function initAuth(){
 function renderNav(){
   const nr = document.getElementById('nav-right');
   nr.innerHTML = user
-    ? `<button class="btn-pill" onclick="resetForm();showPage('add')">+ Add Recipe</button><button class="btn-ghost" onclick="doSignOut()">Sign out</button>`
-    : `<button class="btn-login" onclick="showPage('suggest')" style="margin-right:4px">Suggest a recipe</button><button class="btn-login" onclick="showPage('login')">Admin login</button>`;
+    ? `<button class="nav-btn nav-btn-outline" onclick="showPage('suggestions')">Suggestions</button><button class="nav-btn nav-btn-fill" onclick="resetForm();showPage('add')">+ Add Recipe</button><button class="nav-btn nav-btn-ghost" onclick="doSignOut()">Sign out</button>`
+    : `<button class="nav-btn nav-btn-outline" onclick="showPage('suggest')">Suggest a recipe</button><button class="nav-btn nav-btn-ghost" onclick="showPage('login')">Admin</button>`;
 }
 
 async function doLogin(){
@@ -319,7 +341,7 @@ async function doLogin(){
   const {error} = await sb.auth.signInWithPassword({email:document.getElementById('le').value, password:document.getElementById('lp').value});
   btn.disabled=false; btn.textContent='Sign in';
   if(error){err.textContent='Incorrect email or password';}
-  else{resetForm();showPage('add');}
+  else{showPage('home');}
 }
 
 async function doSignOut(){await sb.auth.signOut();showPage('home');}
@@ -563,41 +585,58 @@ async function submitSuggestion(){
   setTimeout(()=>{document.getElementById('sug-success').style.display='none'},3000);
 }
 
-async function loadSuggestions(){
+// ── ADMIN SUGGESTIONS PAGE ────────────────────────────────────────────────────
+let activeSugId = null;
+
+async function loadAdminSuggestions(){
+  const container = document.getElementById('admin-sug-list');
+  container.innerHTML='<p style="font-size:14px;color:var(--muted)">Loading...</p>';
   const {data} = await sb.from('suggestions').select('*').eq('status','pending').order('created_at',{ascending:false});
-  const container=document.getElementById('sug-list');
   if(!data||!data.length){
     container.innerHTML='<p style="font-size:14px;color:var(--muted);padding:20px 0">No pending suggestions</p>';
     return;
   }
-  container.innerHTML=data.map(s=>`
-    <div class="sug-card" id="sugc-${s.id}">
-      <div class="sug-card-top">
-        <div>
-          <div class="sug-recipe-title">${esc(s.title)}</div>
-          ${s.name?`<div class="sug-from">Suggested by ${esc(s.name)}</div>`:''}
-          ${s.notes?`<div class="sug-notes-text">${esc(s.notes)}</div>`:''}
-        </div>
-        <div class="sug-actions">
-          <button class="sug-accept" onclick="acceptSuggestion('${s.id}','${esc(s.title)}','${esc(s.notes||'')}')">Accept</button>
-          <button class="sug-dismiss" onclick="dismissSuggestion('${s.id}')">Dismiss</button>
-        </div>
+  container.innerHTML=`<div style="border-top:1px solid var(--border)">`+data.map(s=>`
+    <div class="sug-row" id="asc-${s.id}" onclick="openSugDetail('${s.id}','${esc(s.title)}','${esc(s.name||'')}','${esc(s.notes||'')}')">
+      <div>
+        <div class="sug-row-title">${esc(s.title)}</div>
+        ${s.name?`<div class="sug-row-sub">Suggested by ${esc(s.name)}</div>`:'<div class="sug-row-sub">Anonymous</div>'}
       </div>
-    </div>`).join('');
+      <span class="sug-row-arrow">→</span>
+    </div>`).join('')+`</div>`;
 }
 
-async function dismissSuggestion(id){
-  await sb.from('suggestions').update({status:'dismissed'}).eq('id',id);
-  document.getElementById('sugc-'+id)?.remove();
-  if(!document.querySelectorAll('.sug-card').length)
-    document.getElementById('sug-list').innerHTML='<p style="font-size:14px;color:var(--muted);padding:20px 0">No pending suggestions</p>';
+function openSugDetail(id, title, name, notes){
+  activeSugId = id;
+  document.getElementById('sug-detail-content').innerHTML=`
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px">${esc(title)}</h2>
+    ${name?`<p style="font-size:13px;color:var(--muted);margin-bottom:16px">Suggested by ${esc(name)}</p>`:''}
+    ${notes?`<div style="background:var(--cream);border-radius:12px;padding:16px;font-size:14px;line-height:1.6;color:var(--ink)">${esc(notes)}</div>`:'<p style="font-size:14px;color:var(--muted);font-style:italic">No additional notes provided.</p>'}`;
+  const modal = document.getElementById('sug-detail-modal');
+  modal.style.display='flex';
 }
 
-function acceptSuggestion(id, title, notes){
-  dismissSuggestion(id);
-  resetForm();
-  document.getElementById('r-title').value=title;
-  showPage('add');
+function closeSugDetail(){
+  document.getElementById('sug-detail-modal').style.display='none';
+  activeSugId=null;
+}
+
+async function acceptSuggestionFromDetail(){
+  if(!activeSugId) return;
+  await sb.from('suggestions').update({status:'accepted'}).eq('id',activeSugId);
+  document.getElementById('asc-'+activeSugId)?.remove();
+  closeSugDetail();
+  if(!document.querySelectorAll('.sug-row').length)
+    document.getElementById('admin-sug-list').innerHTML='<p style="font-size:14px;color:var(--muted);padding:20px 0">No pending suggestions</p>';
+}
+
+async function denySuggestion(){
+  if(!activeSugId) return;
+  await sb.from('suggestions').update({status:'dismissed'}).eq('id',activeSugId);
+  document.getElementById('asc-'+activeSugId)?.remove();
+  closeSugDetail();
+  if(!document.querySelectorAll('.sug-row').length)
+    document.getElementById('admin-sug-list').innerHTML='<p style="font-size:14px;color:var(--muted);padding:20px 0">No pending suggestions</p>';
 }
 
 // ── EDIT ──────────────────────────────────────────────────────────────────────
