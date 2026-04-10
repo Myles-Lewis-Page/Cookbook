@@ -652,12 +652,7 @@ function addMI(){ masterIngs.push({amount:'',unit:'',name:''}); renderMI(); cont
 function getFilled(){ return masterIngs.filter(ingObjFilled); }
 
 function refreshDD(){
-  const filled = getFilled().map(ingToString);
-  document.querySelectorAll('.step-ing-sel').forEach(sel=>{
-    const cur=sel.value;
-    sel.innerHTML=`<option value="">${filled.length?'Select ingredient':'Add ingredients above first'}</option>`
-      +filled.map(f=>`<option value="${esc(f)}"${f===cur?' selected':''}>${esc(f)}</option>`).join('');
-  });
+  steps.forEach(s=>renderSI(s.id));
 }
 
 // ── STEPS ─────────────────────────────────────────────────────────────────────
@@ -701,59 +696,76 @@ function renderStep(id){
 function updateStepF(id,f,v){const s=steps.find(s=>s.id===id);if(s)s[f]=v}
 
 function renderSI(id){
-  const s=steps.find(s=>s.id===id), c=document.getElementById('si'+id);
+  const s=steps.find(s=>s.id===id), c=document.getElementById("si"+id);
   if(!s||!c) return;
   const filled=getFilled().map(ingToString);
-  const used=getUsedIngredients(id);
-  c.innerHTML=s.ingredients.map((v,i)=>`<div class="birow"><div class="bd-m"></div><select class="bselect step-ing-sel" onchange="updateSI(${id},${i},this.value)">${filled.length===0?'<option value="">Add ingredients above first</option>':filled.map(f=>`<option value="${esc(f)}"${f===v?' selected':''}>${esc(f)}</option>`).join('')}</select><button class="rmx" onclick="removeSI(${id},${i})">×</button></div>`).join('')+renderIngTracker(id, filled, used);
+  c.innerHTML=s.ingredients.map((v,i)=>{
+    const used=getUsedIngredients(id,i);
+    const available=filled.filter(f=>!used.has(f)||f===v);
+    return `<div class="birow"><div class="bd-m"></div><select class="bselect step-ing-sel" onchange="updateSI(${id},${i},this.value)">${!v&&available.length===0?"<option value=\"\">All ingredients assigned</option>":"<option value=\"\">Select ingredient</option>"+available.map(f=>`<option value="${esc(f)}"${f===v?" selected":""}>${esc(f)}</option>`).join("")}</select><button class="rmx" onclick="removeSI(${id},${i})">x</button></div>`;
+  }).join("")+renderIngTracker(id,filled,false);
 }
 
-function getUsedIngredients(currentId){
+function getUsedIngredients(excludeStepId, excludeIngIdx){
   const used=new Set();
   steps.forEach(s=>{
-    s.ingredients.forEach(v=>{ if(v) used.add(v); });
+    s.ingredients.forEach((v,i)=>{
+      if(v && !(s.id===excludeStepId && i===excludeIngIdx)) used.add(v);
+    });
   });
   return used;
 }
-function getEUsedIngredients(currentId){
+function getEUsedIngredients(excludeStepId, excludeIngIdx){
   const used=new Set();
   editSteps.forEach(s=>{
-    s.ingredients.forEach(v=>{ if(v) used.add(v); });
+    s.ingredients.forEach((v,i)=>{
+      if(v && !(s.id===excludeStepId && i===excludeIngIdx)) used.add(v);
+    });
   });
   return used;
 }
 
-function renderIngTracker(stepId, filled, used, isEdit){
+function allIngsUsed(filled){
+  const used=new Set();
+  steps.forEach(s=>s.ingredients.forEach(v=>{if(v)used.add(v)}));
+  return filled.length>0 && filled.every(f=>used.has(f));
+}
+function allEIngsUsed(filled){
+  const used=new Set();
+  editSteps.forEach(s=>s.ingredients.forEach(v=>{if(v)used.add(v)}));
+  return filled.length>0 && filled.every(f=>used.has(f));
+}
+
+function renderIngTracker(stepId, filled, isEdit){
   if(!filled.length) return '';
-  const allUsed = filled.every(f => used.has(f));
-  const unused = filled.filter(f => !used.has(f));
-  if(allUsed) return `<div class="ing-tracker ing-tracker-done">✓ All ingredients accounted for</div>`;
-  return `<div class="ing-tracker">Not yet added to any step: ${unused.map(f=>`<span class="ing-tracker-pill">${esc(f)}</span>`).join('')}</div>`;
+  const done = isEdit ? allEIngsUsed(filled) : allIngsUsed(filled);
+  if(done) return `<div class="ing-tracker ing-tracker-done">✓ All ingredients accounted for</div>`;
+  return '';
 }
 
 function addSI(id){
   const s=steps.find(s=>s.id===id);
-  if(s){s.ingredients.push('');renderSI(id);}
+  if(s){s.ingredients.push('');steps.forEach(st=>renderSI(st.id));}
 }
 function removeSI(id,i){
   const s=steps.find(s=>s.id===id);
-  if(s){s.ingredients.splice(i,1);renderSI(id);}
+  if(s){s.ingredients.splice(i,1);steps.forEach(st=>renderSI(st.id));}
 }
 function updateSI(id,i,v){
   const s=steps.find(s=>s.id===id);
-  if(s){s.ingredients[i]=v;renderSI(id);}
+  if(s){s.ingredients[i]=v;steps.forEach(st=>renderSI(st.id));}
 }
 function addESI(id){
   const s=editSteps.find(s=>s.id===id);
-  if(s){s.ingredients.push('');renderESI(id);}
+  if(s){s.ingredients.push('');editSteps.forEach(st=>renderESI(st.id));}
 }
 function removeESI(id,i){
   const s=editSteps.find(s=>s.id===id);
-  if(s){s.ingredients.splice(i,1);renderESI(id);}
+  if(s){s.ingredients.splice(i,1);editSteps.forEach(st=>renderESI(st.id));}
 }
 function updateESI(id,i,v){
   const s=editSteps.find(s=>s.id===id);
-  if(s){s.ingredients[i]=v;renderESI(id);}
+  if(s){s.ingredients[i]=v;editSteps.forEach(st=>renderESI(st.id));}
 }
 
 function renderSN(id){
@@ -929,12 +941,7 @@ function renderEMI(){
 function addEMI(){editMasterIngs.push({amount:'',unit:'',name:''});renderEMI();document.getElementById('emil').querySelectorAll('.ing-name').forEach((e,i)=>{if(i===editMasterIngs.length-1)e.focus()})}
 
 function refreshEDD(){
-  const filled=getEFilled().map(ingToString);
-  document.querySelectorAll('.estep-ing-sel').forEach(sel=>{
-    const cur=sel.value;
-    sel.innerHTML=`<option value="">${filled.length?'Select ingredient':'Add ingredients above first'}</option>`
-      +filled.map(f=>`<option value="${esc(f)}"${f===cur?' selected':''}>${esc(f)}</option>`).join('');
-  });
+  editSteps.forEach(s=>renderESI(s.id));
 }
 
 function renderESteps(){
@@ -984,8 +991,11 @@ function renderESI(id){
   const s=editSteps.find(s=>s.id===id), c=document.getElementById('esi'+id);
   if(!s||!c) return;
   const filled=getEFilled().map(ingToString);
-  const used=getEUsedIngredients(id);
-  c.innerHTML=s.ingredients.map((v,i)=>`<div class="birow"><div class="bd-m"></div><select class="bselect estep-ing-sel" onchange="updateESI(${id},${i},this.value)">${filled.length===0?'<option value="">Add ingredients above first</option>':filled.map(f=>`<option value="${esc(f)}"${f===v?' selected':''}>${esc(f)}</option>`).join('')}</select><button class="rmx" onclick="removeESI(${id},${i})">×</button></div>`).join('')+renderIngTracker(id, filled, used, true);
+  c.innerHTML=s.ingredients.map((v,i)=>{
+    const used=getEUsedIngredients(id,i);
+    const available=filled.filter(f=>!used.has(f)||f===v);
+    return `<div class="birow"><div class="bd-m"></div><select class="bselect estep-ing-sel" onchange="updateESI(${id},${i},this.value)">${!v&&available.length===0?`<option value="">All ingredients assigned</option>`:`<option value="">Select ingredient</option>`+available.map(f=>`<option value="${esc(f)}"${f===v?' selected':''}>${esc(f)}</option>`).join('')}</select><button class="rmx" onclick="removeESI(${id},${i})">×</button></div>`;
+  }).join('')+renderIngTracker(id,filled,true);
 }
 
 function renderESN(id){
