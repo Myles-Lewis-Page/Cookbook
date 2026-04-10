@@ -551,13 +551,18 @@ async function loadIngredientDB() {
 }
 
 async function ensureIngredient(name) {
-  name = name.trim();
+  name = capFirst(name.trim());
   if (!name) return;
   const exists = ingredientDB.find(i => i.name.toLowerCase() === name.toLowerCase());
   if (!exists) {
     const {data} = await sb.from('ingredients').insert({name}).select().single();
     if (data) ingredientDB.push(data);
   }
+}
+
+function capFirst(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // ── INGREDIENT ROW RENDERER ───────────────────────────────────────────────────
@@ -588,6 +593,8 @@ function makeIngRow(ing, onAmount, onUnit, onName, onRemove, prefix) {
 
   // Autocomplete
   nameEl.addEventListener('input', () => {
+    const capped = capFirst(nameEl.value);
+    if (nameEl.value !== capped) { const pos = nameEl.selectionStart; nameEl.value = capped; nameEl.setSelectionRange(pos, pos); }
     onName(nameEl.value);
     const q = nameEl.value.trim().toLowerCase();
     if (!q) { dropEl.style.display='none'; return; }
@@ -600,8 +607,9 @@ function makeIngRow(ing, onAmount, onUnit, onName, onRemove, prefix) {
     dropEl.querySelectorAll('[data-name]').forEach(el => {
       el.addEventListener('mousedown', e => {
         e.preventDefault();
-        nameEl.value = el.dataset.name;
-        onName(el.dataset.name);
+        const picked = capFirst(el.dataset.name);
+        nameEl.value = picked;
+        onName(picked);
         dropEl.style.display='none';
       });
     });
