@@ -115,13 +115,23 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
 .add-wrap>.sub{font-size:14px;color:var(--muted);margin-bottom:40px}
 .card{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:16px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-.birow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.bd-a{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
-.bd-m{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
-.binput{flex:1;background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px;color:var(--ink);outline:none;font-family:'DM Sans',sans-serif}
-.binput:focus{border-color:var(--accent)}
-.bselect{flex:1;background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px;color:var(--ink);outline:none;font-family:'DM Sans',sans-serif}
-.bselect:focus{border-color:var(--accent)}
+.ing-row{display:grid;grid-template-columns:90px 110px 1fr 28px;align-items:center;gap:8px;margin-bottom:8px}
+.ing-amount{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:14px;color:var(--ink);outline:none;font-family:'DM Sans',sans-serif;width:100%;text-align:center}
+.ing-amount:focus{border-color:var(--accent)}
+.ing-unit{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:8px 8px;font-size:13px;color:var(--ink);outline:none;font-family:'DM Sans',sans-serif;width:100%}
+.ing-unit:focus{border-color:var(--accent)}
+.ing-name{background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px;color:var(--ink);outline:none;font-family:'DM Sans',sans-serif;width:100%}
+.ing-name:focus{border-color:var(--accent)}
+.ing-name-wrap{position:relative}
+.ing-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--border);border-radius:10px;z-index:50;max-height:180px;overflow-y:auto;margin-top:2px;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+.ing-dropdown-item{padding:8px 12px;font-size:13px;color:var(--ink);cursor:pointer}
+.ing-dropdown-item:hover{background:var(--cream)}
+.ing-dropdown-new{padding:8px 12px;font-size:13px;color:var(--accent);cursor:pointer;border-top:1px solid var(--border)}
+.ing-dropdown-new:hover{background:var(--cream)}
+.ing-row-labels{display:grid;grid-template-columns:90px 110px 1fr 28px;gap:8px;margin-bottom:4px}
+.ing-col-label{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center}
+.ing-col-label:last-child{visibility:hidden}
+@media(max-width:600px){.ing-row{grid-template-columns:70px 90px 1fr 28px}}
 .rmx{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .rmx:hover{border-color:#fca5a5;color:#f87171;background:#fef2f2}
 .addbtn{font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px}
@@ -139,6 +149,27 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
 .save-btn:hover{background:#2d2520}
 .save-btn:disabled{opacity:.5;cursor:not-allowed}
 @media(max-width:600px){.cat-grid{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.hero h1{font-size:36px}.recipe-title{font-size:32px}}
+.plan-day{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px}
+.plan-day-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.plan-day-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--ink)}
+.plan-meal-row{margin-bottom:12px}
+.plan-meal-label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.plan-meal-select{display:flex;align-items:center;gap:8px}
+.plan-select{flex:1;background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:14px;color:var(--ink);outline:none;font-family:'DM Sans',sans-serif}
+.plan-select:focus{border-color:var(--accent)}
+.lucky-btn{background:none;border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;flex-shrink:0}
+.lucky-btn:hover{border-color:var(--accent);color:var(--accent)}
+.shopping-section{margin-top:32px}
+.shopping-category{margin-bottom:24px}
+.shopping-cat-label{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.shopping-item{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--ink);cursor:pointer}
+.shopping-item:last-child{border-bottom:none}
+.shopping-item.checked{color:var(--muted);text-decoration:line-through}
+.shop-check{width:16px;height:16px;border:1.5px solid var(--border);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.shop-check.done{background:var(--accent);border-color:var(--accent)}
+.print-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink)}
+.print-btn:hover{border-color:var(--ink)}
+@media print{nav,.back-btn,.plan-section,.save-btn,.print-btn{display:none!important}.shopping-section{display:block!important}}
 </style>
 </head>
 <body>
@@ -215,7 +246,11 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
       </div>
     </div>
     <div class="slabel" style="margin-top:24px">All ingredients</div>
-    <div class="card"><div id="emil"></div><button class="addbtn" onclick="addEMI()">+ Add ingredient</button></div>
+    <div class="card">
+      <div class="ing-row-labels"><span class="ing-col-label">Amount</span><span class="ing-col-label">Unit</span><span class="ing-col-label">Ingredient</span><span class="ing-col-label">.</span></div>
+      <div id="emil"></div>
+      <button class="addbtn" onclick="addEMI()">+ Add ingredient</button>
+    </div>
     <div class="slabel" style="margin-top:24px">Recipe steps</div>
     <div id="esc2"></div>
     <button class="add-step-btn" onclick="addEStep()">+ Add step</button>
@@ -236,6 +271,30 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
     <div class="errmsg" id="lerr"></div>
     <button class="btn-primary" id="lbtn" onclick="doLogin()">Sign in</button>
   </div>
+</div>
+
+<div id="page-plan" class="page">
+  <main style="max-width:680px">
+    <button class="back-btn" onclick="showPage('home')">← Back</button>
+    <h1 style="font-family:'Playfair Display',serif;font-size:40px;margin-bottom:6px">Weekly food plan</h1>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:32px">Select meals for each day — or go lucky. We'll build your shopping list automatically.</p>
+
+    <div class="plan-section">
+      <div id="plan-days"></div>
+      <button class="save-btn" onclick="buildShoppingList()" style="margin-top:8px">Build shopping list</button>
+    </div>
+
+    <div class="shopping-section" id="shopping-section" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 style="font-family:'Playfair Display',serif;font-size:28px">Shopping list</h2>
+        <div style="display:flex;gap:8px">
+          <button class="print-btn" onclick="window.print()">Print</button>
+          <button class="print-btn" onclick="document.getElementById('shopping-section').style.display='none';document.getElementById('plan-days').closest('.plan-section').style.display='block'">← Edit plan</button>
+        </div>
+      </div>
+      <div id="shopping-list-content"></div>
+    </div>
+  </main>
 </div>
 
 <div id="page-make" class="page">
@@ -312,14 +371,16 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
       </div>
     </div>
     <div class="slabel" style="margin-top:24px">All ingredients</div>
-    <div class="card"><div id="mil"></div><button class="addbtn" onclick="addMI()">+ Add ingredient</button></div>
+    <div class="card">
+      <div class="ing-row-labels"><span class="ing-col-label">Amount</span><span class="ing-col-label">Unit</span><span class="ing-col-label">Ingredient</span><span class="ing-col-label">.</span></div>
+      <div id="mil"></div>
+      <button class="addbtn" onclick="addMI()">+ Add ingredient</button>
+    </div>
     <div class="slabel" style="margin-top:24px">Recipe steps</div>
     <div id="sc"></div>
     <button class="add-step-btn" onclick="addStep()">+ Add step</button>
     <div class="errmsg" id="serr"></div>
     <button class="save-btn" id="sbtn" onclick="saveRecipe()">Save recipe</button>
-  </div>
-</div>
   </div>
 </div>
 
@@ -329,7 +390,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let user = null, curCat = null, stepCount = 0;
-let masterIngs = [], steps = [];
 let currentRecipeId=null, currentRecipeCat=null, currentRecipePrepTime=null, currentRecipeCookTime=null, currentRecipeServings=null, currentRecipeIngs=[], currentRecipeSteps=[];
 
 const CATS = {
@@ -345,6 +405,7 @@ function showPage(name){
   document.getElementById('page-'+name).classList.add('active');
   window.scrollTo(0,0);
   if(name==='home') loadHome();
+  if(name==='plan') initPlanPage();
   if(name==='make') initMakePage();
   if(name==='suggestions' && user) loadAdminSuggestions();
 }
@@ -353,13 +414,14 @@ async function initAuth(){
   const {data:{session}} = await sb.auth.getSession();
   user = session?.user||null; renderNav();
   sb.auth.onAuthStateChange((_,s)=>{user=s?.user||null;renderNav()});
+  loadIngredientDB();
 }
 
 function renderNav(){
   const nr = document.getElementById('nav-right');
   nr.innerHTML = user
-    ? `<button class="nav-btn nav-btn-outline" onclick="showPage('make')">What should I make?</button><button class="nav-btn nav-btn-outline" onclick="showPage('suggestions')">Suggestions</button><button class="nav-btn nav-btn-fill" onclick="resetForm();showPage('add')">+ Add Recipe</button><button class="nav-btn nav-btn-ghost" onclick="doSignOut()">Sign out</button>`
-    : `<button class="nav-btn nav-btn-outline" onclick="showPage('make')">What should I make?</button><button class="nav-btn nav-btn-outline" onclick="showPage('suggest')">Suggest a recipe</button><button class="nav-btn nav-btn-ghost" onclick="showPage('login')">Admin</button>`;
+    ? `<button class="nav-btn nav-btn-outline" onclick="showPage('plan')">Weekly plan</button><button class="nav-btn nav-btn-outline" onclick="showPage('make')">What should I make?</button><button class="nav-btn nav-btn-outline" onclick="showPage('suggestions')">Suggestions</button><button class="nav-btn nav-btn-fill" onclick="resetForm();showPage('add')">+ Add Recipe</button><button class="nav-btn nav-btn-ghost" onclick="doSignOut()">Sign out</button>`
+    : `<button class="nav-btn nav-btn-outline" onclick="showPage('plan')">Weekly plan</button><button class="nav-btn nav-btn-outline" onclick="showPage('make')">What should I make?</button><button class="nav-btn nav-btn-outline" onclick="showPage('suggest')">Suggest a recipe</button><button class="nav-btn nav-btn-ghost" onclick="showPage('login')">Admin</button>`;
 }
 
 async function doLogin(){
@@ -374,21 +436,36 @@ async function doLogin(){
 async function doSignOut(){await sb.auth.signOut();showPage('home');}
 
 async function loadHome(){
-  const {data:all} = await sb.from('recipes').select('category');
-  const counts={};
-  (all||[]).forEach(r=>{counts[r.category]=(counts[r.category]||0)+1});
+  // Render categories immediately without waiting for counts
   document.getElementById('cat-grid').innerHTML = Object.entries(CATS).map(([name,{icon}])=>`
     <button class="cat-card" onclick="loadCat('${esc(name)}')">
       <div class="cat-icon">${icon}</div>
       <div class="cat-name">${name}</div>
-      <div class="cat-count">${counts[name]||0} ${counts[name]===1?'recipe':'recipes'}</div>
+      <div class="cat-count" id="count-${esc(name.replace(/[^a-z]/gi,''))}">...</div>
     </button>`).join('');
-  const {data:recent} = await sb.from('recipes').select('id,title,category').order('created_at',{ascending:false}).limit(6);
-  const rw=document.getElementById('recent-wrap'), rl=document.getElementById('recent-list');
-  if(recent&&recent.length){
-    rw.style.display='block';
-    rl.innerHTML=recent.map(r=>`<div class="recent-item" onclick="loadRecipe('${r.id}','${esc(r.category)}')"><span class="rtitle">${esc(r.title)}</span><span class="tag">${esc(r.category)}</span></div>`).join('');
-  } else { rw.style.display='none'; }
+
+  // Then fetch counts and update
+  try {
+    const {data:all, error} = await sb.from('recipes').select('category');
+    if (!error) {
+      const counts={};
+      (all||[]).forEach(r=>{counts[r.category]=(counts[r.category]||0)+1});
+      Object.keys(CATS).forEach(name => {
+        const el = document.getElementById('count-'+name.replace(/[^a-z]/gi,''));
+        if (el) el.textContent = `${counts[name]||0} ${counts[name]===1?'recipe':'recipes'}`;
+      });
+    }
+  } catch(e) { console.error('loadHome counts error:', e); }
+
+  // Fetch recent recipes
+  try {
+    const {data:recent} = await sb.from('recipes').select('id,title,category').order('created_at',{ascending:false}).limit(6);
+    const rw=document.getElementById('recent-wrap'), rl=document.getElementById('recent-list');
+    if(recent&&recent.length){
+      rw.style.display='block';
+      rl.innerHTML=recent.map(r=>`<div class="recent-item" onclick="loadRecipe('${r.id}','${esc(r.category)}')"><span class="rtitle">${esc(r.title)}</span><span class="tag">${esc(r.category)}</span></div>`).join('');
+    } else { rw.style.display='none'; }
+  } catch(e) { console.error('loadHome recent error:', e); }
 }
 
 async function loadCat(name){
@@ -431,16 +508,105 @@ async function loadRecipe(id, fromCat){
   if(r.cook_time) meta.push(`<p><strong>Cook Time:</strong> ${esc(r.cook_time)}</p>`);
   if(r.servings)  meta.push(`<p><strong>Servings:</strong> ${esc(r.servings)}</p>`);
   document.getElementById('rm').innerHTML=meta.join('');
-  document.getElementById('ri').innerHTML=(r.all_ingredients||[]).map(i=>`<li><span class="dot dot-a"></span>${esc(i)}</li>`).join('');
+  document.getElementById('ri').innerHTML=(r.all_ingredients||[]).map(i=>{
+    const str = typeof i==='object' ? ingToString(i) : i;
+    return `<li><span class="dot dot-a"></span>${esc(str)}</li>`;
+  }).join('');
   document.getElementById('rs').innerHTML=(r.steps||[]).map(s=>`
     <div class="step-block">
       ${s.title?`<div class="sec-title">${esc(s.title)}</div>`:''}
-      ${s.ingredients?.length?`<div class="subsec-label">Ingredients Used</div><ul class="blist">${s.ingredients.map(i=>`<li><span class="dot dot-m"></span>${esc(i)}</li>`).join('')}</ul>`:''}
+      ${s.ingredients?.length?`<div class="subsec-label">Ingredients Used</div><ul class="blist">${s.ingredients.map(i=>{const str=typeof i==='object'?ingToString(i):i;return`<li><span class="dot dot-m"></span>${esc(str)}</li>`}).join('')}</ul>`:''}
       ${s.instructions?.length?`<div class="subsec-label">Instructions</div><ul class="blist">${s.instructions.map(i=>`<li><span class="dot dot-a"></span>${esc(i)}</li>`).join('')}</ul>`:''}
     </div>`).join('');
   showPage('recipe');
 }
 
+// ── INGREDIENT HELPERS ────────────────────────────────────────────────────────
+const UNITS = ['','whole','tsp','tbsp','cup','cups','oz','lb','lbs','g','kg','ml','l','clove','cloves','slice','slices','bunch','can','cans','pkg','piece','pieces','pinch','dash','handful','sprig','sprigs','head','heads','stalk','stalks','strip','strips','rib','ribs','quart','pint','gallon','fl oz'];
+
+function ingToString(ing) {
+  if (typeof ing === 'string') return ing;
+  const parts = [];
+  if (ing.amount) parts.push(ing.amount);
+  if (ing.unit && ing.unit !== 'whole') parts.push(ing.unit);
+  if (ing.name) parts.push(ing.name);
+  return parts.join(' ');
+}
+
+function ingObjFilled(ing) {
+  return !!(ing && ing.name && ing.name.trim());
+}
+
+let ingredientDB = []; // master list from DB
+
+async function loadIngredientDB() {
+  const {data} = await sb.from('ingredients').select('id,name').order('name',{ascending:true});
+  ingredientDB = data || [];
+}
+
+async function ensureIngredient(name) {
+  name = name.trim();
+  if (!name) return;
+  const exists = ingredientDB.find(i => i.name.toLowerCase() === name.toLowerCase());
+  if (!exists) {
+    const {data} = await sb.from('ingredients').insert({name}).select().single();
+    if (data) ingredientDB.push(data);
+  }
+}
+
+// ── INGREDIENT ROW RENDERER ───────────────────────────────────────────────────
+function makeIngRow(ing, onAmount, onUnit, onName, onRemove, prefix) {
+  const id = prefix + '_row_' + Math.random().toString(36).slice(2,7);
+  const dropId = prefix + '_drop_' + Math.random().toString(36).slice(2,7);
+  const row = document.createElement('div');
+  row.className = 'ing-row';
+  row.innerHTML = `
+    <input class="ing-amount" type="text" placeholder="e.g. ¼" value="${esc(ing.amount||'')}" />
+    <select class="ing-unit">
+      ${UNITS.map(u=>`<option value="${u}"${ing.unit===u?' selected':''}>${u||'(no unit)'}</option>`).join('')}
+    </select>
+    <div class="ing-name-wrap">
+      <input class="ing-name" type="text" placeholder="Type ingredient..." value="${esc(ing.name||'')}" autocomplete="off"/>
+      <div class="ing-dropdown" id="${dropId}" style="display:none"></div>
+    </div>
+    <button class="rmx">×</button>`;
+
+  const amountEl = row.querySelector('.ing-amount');
+  const unitEl   = row.querySelector('.ing-unit');
+  const nameEl   = row.querySelector('.ing-name');
+  const dropEl   = row.querySelector('.ing-dropdown');
+
+  amountEl.addEventListener('input', () => onAmount(amountEl.value));
+  unitEl.addEventListener('change', () => onUnit(unitEl.value));
+  row.querySelector('.rmx').addEventListener('click', () => { row.remove(); onRemove(); });
+
+  // Autocomplete
+  nameEl.addEventListener('input', () => {
+    onName(nameEl.value);
+    const q = nameEl.value.trim().toLowerCase();
+    if (!q) { dropEl.style.display='none'; return; }
+    const matches = ingredientDB.filter(i => i.name.toLowerCase().includes(q)).slice(0,8);
+    const exactMatch = ingredientDB.some(i => i.name.toLowerCase() === q);
+    let html = matches.map(i => `<div class="ing-dropdown-item" data-name="${esc(i.name)}">${esc(i.name)}</div>`).join('');
+    if (!exactMatch && q) html += `<div class="ing-dropdown-new" data-name="${esc(nameEl.value.trim())}">+ Add "${esc(nameEl.value.trim())}"</div>`;
+    dropEl.innerHTML = html;
+    dropEl.style.display = html ? 'block' : 'none';
+    dropEl.querySelectorAll('[data-name]').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        nameEl.value = el.dataset.name;
+        onName(el.dataset.name);
+        dropEl.style.display='none';
+      });
+    });
+  });
+  nameEl.addEventListener('blur', () => setTimeout(()=>dropEl.style.display='none', 150));
+  nameEl.addEventListener('focus', () => nameEl.dispatchEvent(new Event('input')));
+
+  return row;
+}
+
+// ── ADD FORM INGREDIENTS ──────────────────────────────────────────────────────
 function resetForm(){
   document.getElementById('r-title').value='';
   document.getElementById('r-cat').value='';
@@ -450,35 +616,44 @@ function resetForm(){
   document.getElementById('r-cook-m').value='';
   document.getElementById('r-serv').value='';
   document.getElementById('serr').textContent='';
-  masterIngs=['','']; steps=[]; stepCount=0;
+  masterIngs=[{amount:'',unit:'',name:''},{amount:'',unit:'',name:''}];
+  steps=[]; stepCount=0;
   renderMI();
   document.getElementById('sc').innerHTML='';
   addStep();
 }
 
-function getFilled(){return masterIngs.filter(i=>i.trim())}
+let masterIngs = [{amount:'',unit:'',name:''},{amount:'',unit:'',name:''}];
 
 function renderMI(){
-  document.getElementById('mil').innerHTML=masterIngs.map((v,i)=>`
-    <div class="birow">
-      <div class="bd-a"></div>
-      <input class="binput" type="text" placeholder="e.g. 4½ cups bread flour" value="${esc(v)}"
-        oninput="masterIngs[${i}]=this.value;refreshDD()" onblur="refreshDD()"/>
-      <button class="rmx" onclick="removeMI(${i})">×</button>
-    </div>`).join('');
+  const container = document.getElementById('mil');
+  container.innerHTML='';
+  masterIngs.forEach((ing,i) => {
+    const row = makeIngRow(ing,
+      v => { masterIngs[i].amount=v; refreshDD(); },
+      v => { masterIngs[i].unit=v;   refreshDD(); },
+      v => { masterIngs[i].name=v;   refreshDD(); },
+      ()  => { masterIngs.splice(i,1); renderMI(); refreshDD(); },
+      'mi'
+    );
+    container.appendChild(row);
+  });
 }
 
-function addMI(){masterIngs.push('');renderMI();document.querySelectorAll('#mil .binput').forEach((e,i)=>{if(i===masterIngs.length-1)e.focus()})}
-function removeMI(i){masterIngs.splice(i,1);renderMI();refreshDD()}
+function addMI(){ masterIngs.push({amount:'',unit:'',name:''}); renderMI(); container=document.getElementById('mil'); container.querySelectorAll('.ing-name').forEach((el,i)=>{if(i===masterIngs.length-1)el.focus()}); }
+function getFilled(){ return masterIngs.filter(ingObjFilled); }
 
 function refreshDD(){
-  const filled=getFilled();
+  const filled = getFilled().map(ingToString);
   document.querySelectorAll('.step-ing-sel').forEach(sel=>{
     const cur=sel.value;
     sel.innerHTML=`<option value="">${filled.length?'Select ingredient':'Add ingredients above first'}</option>`
       +filled.map(f=>`<option value="${esc(f)}"${f===cur?' selected':''}>${esc(f)}</option>`).join('');
   });
 }
+
+// ── STEPS ─────────────────────────────────────────────────────────────────────
+let steps = [];
 
 function addStep(){
   const id=++stepCount;
@@ -520,7 +695,7 @@ function updateStepF(id,f,v){const s=steps.find(s=>s.id===id);if(s)s[f]=v}
 function renderSI(id){
   const s=steps.find(s=>s.id===id), c=document.getElementById('si'+id);
   if(!s||!c) return;
-  const filled=getFilled();
+  const filled=getFilled().map(ingToString);
   c.innerHTML=s.ingredients.map((v,i)=>`
     <div class="birow"><div class="bd-m"></div>
       <select class="bselect step-ing-sel" onchange="updateSI(${id},${i},this.value)">
@@ -565,6 +740,8 @@ async function saveRecipe(){
   if(!filled.length) return err.textContent='Add at least one ingredient';
   const btn=document.getElementById('sbtn');
   btn.disabled=true; btn.textContent='Saving...';
+  // Save new ingredients to DB
+  await Promise.all(filled.map(i => ensureIngredient(i.name)));
   const {data,error} = await sb.from('recipes').insert({
     title:title.toUpperCase(), category,
     prep_time:buildTime(document.getElementById('r-prep-h').value, document.getElementById('r-prep-m').value),
@@ -670,9 +847,8 @@ async function denySuggestion(){
 let editId=null, editMasterIngs=[], editSteps=[], editStepCount=0, editCurCat=null;
 
 function openEdit(){
-  // copy current recipe data into edit form
   editId=currentRecipeId; editCurCat=curCat;
-  document.getElementById('e-title').value=document.getElementById('rt').textContent.replace(/^(.+)$/,s=>s);
+  document.getElementById('e-title').value=document.getElementById('rt').textContent;
   document.getElementById('e-cat').value=currentRecipeCat||'';
   const prepParts=parseTime(currentRecipePrepTime);
   const cookParts=parseTime(currentRecipeCookTime);
@@ -681,7 +857,9 @@ function openEdit(){
   document.getElementById('e-cook-h').value=cookParts.h||'';
   document.getElementById('e-cook-m').value=cookParts.m||'';
   document.getElementById('e-serv').value=currentRecipeServings||'';
-  editMasterIngs=[...currentRecipeIngs];
+  // Normalize existing ingredients to objects
+  editMasterIngs=currentRecipeIngs.map(i => typeof i==='object' ? {...i} : {amount:'',unit:'',name:i});
+  if(!editMasterIngs.length) editMasterIngs=[{amount:'',unit:'',name:''}];
   editSteps=JSON.parse(JSON.stringify(currentRecipeSteps));
   editStepCount=editSteps.length;
   renderEMI(); renderESteps();
@@ -690,22 +868,27 @@ function openEdit(){
 }
 
 function cancelEdit(){loadRecipe(editId, editCurCat)}
-
-function getEFilled(){return editMasterIngs.filter(i=>i.trim())}
+function getEFilled(){return editMasterIngs.filter(ingObjFilled)}
 
 function renderEMI(){
-  document.getElementById('emil').innerHTML=editMasterIngs.map((v,i)=>`
-    <div class="birow"><div class="bd-a"></div>
-      <input class="binput" type="text" value="${esc(v)}" placeholder="e.g. 4½ cups bread flour"
-        oninput="editMasterIngs[${i}]=this.value;refreshEDD()" onblur="refreshEDD()"/>
-      <button class="rmx" onclick="removeEMI(${i})">×</button>
-    </div>`).join('');
+  const container=document.getElementById('emil');
+  container.innerHTML='';
+  editMasterIngs.forEach((ing,i)=>{
+    const row=makeIngRow(ing,
+      v=>{editMasterIngs[i].amount=v;refreshEDD()},
+      v=>{editMasterIngs[i].unit=v;refreshEDD()},
+      v=>{editMasterIngs[i].name=v;refreshEDD()},
+      ()=>{editMasterIngs.splice(i,1);renderEMI();refreshEDD()},
+      'emi'
+    );
+    container.appendChild(row);
+  });
 }
-function addEMI(){editMasterIngs.push('');renderEMI();document.querySelectorAll('#emil .binput').forEach((e,i)=>{if(i===editMasterIngs.length-1)e.focus()})}
-function removeEMI(i){editMasterIngs.splice(i,1);renderEMI();refreshEDD()}
+
+function addEMI(){editMasterIngs.push({amount:'',unit:'',name:''});renderEMI();document.getElementById('emil').querySelectorAll('.ing-name').forEach((e,i)=>{if(i===editMasterIngs.length-1)e.focus()})}
 
 function refreshEDD(){
-  const filled=getEFilled();
+  const filled=getEFilled().map(ingToString);
   document.querySelectorAll('.estep-ing-sel').forEach(sel=>{
     const cur=sel.value;
     sel.innerHTML=`<option value="">${filled.length?'Select ingredient':'Add ingredients above first'}</option>`
@@ -759,7 +942,7 @@ function updateEStepF(id,f,v){const s=editSteps.find(s=>s.id===id);if(s)s[f]=v}
 function renderESI(id){
   const s=editSteps.find(s=>s.id===id), c=document.getElementById('esi'+id);
   if(!s||!c) return;
-  const filled=getEFilled();
+  const filled=getEFilled().map(ingToString);
   c.innerHTML=s.ingredients.map((v,i)=>`
     <div class="birow"><div class="bd-m"></div>
       <select class="bselect estep-ing-sel" onchange="updateESI(${id},${i},this.value)">
@@ -798,6 +981,7 @@ async function updateRecipe(){
   if(!filled.length) return err.textContent='Add at least one ingredient';
   const btn=document.getElementById('ubtn');
   btn.disabled=true; btn.textContent='Saving...';
+  await Promise.all(filled.map(i=>ensureIngredient(i.name)));
   const {error} = await sb.from('recipes').update({
     title:title.toUpperCase(), category,
     prep_time:buildTime(document.getElementById('e-prep-h').value, document.getElementById('e-prep-m').value),
@@ -927,6 +1111,289 @@ async function findRecipes() {
         </div>`;
       }).join('')}
     </div>`;
+}
+
+// ── WEEKLY PLAN ───────────────────────────────────────────────────────────────
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const PLAN_MEALS = {
+  'Dinner': {label:'Dinner', cat:'Entrees'},
+};
+
+let planRecipes = {}; // {Breakfast:[], Lunch:[], Entrees:[]}
+let planSelections = {}; // {Monday:{Breakfast:'id', Lunch:'id', Dinner:'id'}, ...}
+let checkedItems = new Set();
+
+async function initPlanPage() {
+  document.getElementById('shopping-section').style.display = 'none';
+  const planSection = document.querySelector('.plan-section');
+  if (planSection) planSection.style.display = 'block';
+  checkedItems = new Set();
+
+  // Fetch recipes for the three relevant categories
+  const cats = ['Entrees'];
+  planRecipes = {};
+  await Promise.all(cats.map(async cat => {
+    const {data} = await sb.from('recipes').select('id,title,all_ingredients').eq('category',cat).order('title',{ascending:true});
+    planRecipes[cat] = data || [];
+  }));
+
+  // Init selections to empty
+  planSelections = {};
+  DAYS.forEach(d => { planSelections[d] = {Breakfast:'', Lunch:'', Dinner:''}; });
+
+  renderPlanDays();
+}
+
+function renderPlanDays() {
+  const container = document.getElementById('plan-days');
+  container.innerHTML = DAYS.map(day => `
+    <div class="plan-day">
+      <div class="plan-day-header">
+        <span class="plan-day-name">${day}</span>
+        <button class="lucky-btn" onclick="feelingLucky('${day}')">🎲 I'm feeling lucky</button>
+      </div>
+      ${Object.entries(PLAN_MEALS).map(([key, {label, cat}]) => `
+        <div class="plan-meal-row">
+          <div class="plan-meal-label">${label}</div>
+          <div class="plan-meal-select">
+            <select class="plan-select" id="plan-${day}-${key}" onchange="planSelections['${day}']['${key}']=this.value">
+              <option value="">— No ${label.toLowerCase()} —</option>
+              ${(planRecipes[cat]||[]).map(r => `<option value="${r.id}" ${planSelections[day][key]===r.id?'selected':''}>${esc(r.title)}</option>`).join('')}
+            </select>
+            <button class="lucky-btn" onclick="luckyMeal('${day}','${key}','${cat}')">🎲</button>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function feelingLucky(day) {
+  Object.entries(PLAN_MEALS).forEach(([key, {cat}]) => {
+    const options = planRecipes[cat] || [];
+    if (options.length) {
+      const pick = options[Math.floor(Math.random() * options.length)];
+      planSelections[day][key] = pick.id;
+      const sel = document.getElementById(`plan-${day}-${key}`);
+      if (sel) sel.value = pick.id;
+    }
+  });
+}
+
+function luckyMeal(day, key, cat) {
+  const options = planRecipes[cat] || [];
+  if (!options.length) return;
+  const pick = options[Math.floor(Math.random() * options.length)];
+  planSelections[day][key] = pick.id;
+  const sel = document.getElementById(`plan-${day}-${key}`);
+  if (sel) sel.value = pick.id;
+}
+
+async function buildShoppingList() {
+  // Collect all selected recipe IDs (deduplicated)
+  const selectedIds = new Set();
+  DAYS.forEach(day => {
+    Object.values(planSelections[day]).forEach(id => { if(id) selectedIds.add(id); });
+  });
+
+  if (!selectedIds.size) {
+    alert('Please select at least one meal first.');
+    return;
+  }
+
+  // Fetch full ingredient lists for selected recipes
+  const {data: recipes} = await sb.from('recipes').select('id,title,category,all_ingredients').in('id',[...selectedIds]);
+  if (!recipes || !recipes.length) return;
+
+  // Build a flat ingredient list, then deduplicate/merge similar items
+  const allIngs = [];
+  recipes.forEach(r => {
+    (r.all_ingredients || []).forEach(ing => {
+      const obj = typeof ing === 'object' ? ing : {amount:'', unit:'', name: ing};
+      allIngs.push(obj);
+    });
+  });
+
+  // Deduplicate: normalize ingredient strings and merge same base items
+  const merged = mergeIngredients(allIngs);
+
+  // Group by rough category for display
+  const groups = groupIngredients(merged);
+
+  // Render
+  document.querySelector('.plan-section').style.display = 'none';
+  const shoppingSection = document.getElementById('shopping-section');
+  shoppingSection.style.display = 'block';
+  checkedItems = new Set();
+
+  // Show which meals were planned
+  const mealSummary = [];
+  DAYS.forEach(day => {
+    const meals = Object.entries(planSelections[day])
+      .filter(([,id]) => id)
+      .map(([key, id]) => {
+        const cat = PLAN_MEALS[key].cat;
+        const r = (planRecipes[cat]||[]).find(r=>r.id===id);
+        return r ? r.title : '';
+      }).filter(Boolean);
+    if (meals.length) mealSummary.push(`<span style="font-weight:500">${day}:</span> ${meals.join(', ')}`);
+  });
+
+  const groupKeys = Object.keys(groups).sort();
+  let itemIndex = 0;
+
+  document.getElementById('shopping-list-content').innerHTML = `
+    <div style="background:var(--cream);border-radius:12px;padding:16px;margin-bottom:28px;font-size:13px;line-height:1.8;color:var(--muted)">
+      ${mealSummary.join('<br>')}
+    </div>
+    ${groupKeys.map(gk => `
+      <div class="shopping-category">
+        <div class="shopping-cat-label">${esc(gk)}</div>
+        ${groups[gk].map(ing => {
+          const idx = itemIndex++;
+          return `<div class="shopping-item" id="si-${idx}" onclick="toggleShopItem(${idx})">
+            <div class="shop-check" id="sc-${idx}"></div>
+            <span>${esc(ing)}</span>
+          </div>`;
+        }).join('')}
+      </div>`).join('')}
+    <p style="font-size:12px;color:var(--muted);margin-top:16px;text-align:center">Tap items to check them off</p>`;
+}
+
+function toggleShopItem(idx) {
+  const item = document.getElementById('si-'+idx);
+  const check = document.getElementById('sc-'+idx);
+  if (checkedItems.has(idx)) {
+    checkedItems.delete(idx);
+    item.classList.remove('checked');
+    check.classList.remove('done');
+    check.innerHTML = '';
+  } else {
+    checkedItems.add(idx);
+    item.classList.add('checked');
+    check.classList.add('done');
+    check.innerHTML = '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  }
+}
+
+function mergeIngredients(ings) {
+  // ings is now array of {amount, unit, name} objects
+  // Group by normalized ingredient name
+  const groups = new Map(); // normName -> [{amount, unit}]
+
+  ings.forEach(ing => {
+    const name = (ing.name || ingToString(ing)).trim();
+    const key = name.toLowerCase();
+    if (!key) return;
+    if (!groups.has(key)) groups.set(key, {name, entries:[]});
+    groups.get(key).entries.push({amount: ing.amount||'', unit: (ing.unit&&ing.unit!=='whole'?ing.unit:'')});
+  });
+
+  const result = [];
+
+  groups.forEach(({name, entries}) => {
+    if (entries.length === 1) {
+      const {amount, unit} = entries[0];
+      const parts = [amount, unit, name].filter(Boolean);
+      result.push(parts.join(' '));
+      return;
+    }
+
+    // Try to sum amounts by unit
+    const byUnit = new Map();
+    let hasUnparseable = false;
+
+    entries.forEach(({amount, unit}) => {
+      const u = unit || '__none__';
+      const parsed = parseAmount(amount);
+      if (parsed === null) { hasUnparseable = true; return; }
+      byUnit.set(u, (byUnit.get(u)||0) + parsed);
+    });
+
+    if (hasUnparseable || byUnit.size === 0) {
+      // Can't sum — just list with count
+      result.push(`${entries[0].amount||''} ${entries[0].unit||''} ${name} ×${entries.length}`.trim());
+      return;
+    }
+
+    const parts = [];
+    byUnit.forEach((total, u) => {
+      const amtStr = toFraction(total);
+      const unitStr = u === '__none__' ? '' : ' ' + unitLabel(u, total);
+      parts.push(amtStr + unitStr);
+    });
+    result.push(parts.join(' + ') + ' ' + name);
+  });
+
+  return result;
+}
+
+const FRAC = {'½':0.5,'⅓':1/3,'⅔':2/3,'¼':0.25,'¾':0.75,'⅛':0.125,'⅜':0.375,'⅝':0.625,'⅞':0.875,'⅙':1/6,'⅚':5/6,'⅕':0.2,'⅖':0.4,'⅗':0.6,'⅘':0.8};
+
+function parseAmount(str) {
+  if (!str) return null;
+  str = String(str).trim();
+  const wuf = str.match(/^(\d+)([½⅓⅔¼¾⅛⅜⅝⅞⅙⅚⅕⅖⅗⅘])/);
+  if (wuf) return parseInt(wuf[1]) + FRAC[wuf[2]];
+  const uf = str.match(/^([½⅓⅔¼¾⅛⅜⅝⅞⅙⅚⅕⅖⅗⅘])/);
+  if (uf) return FRAC[uf[1]];
+  const wsf = str.match(/^(\d+)\s+(\d+)\/(\d+)/);
+  if (wsf) return parseInt(wsf[1]) + parseInt(wsf[2])/parseInt(wsf[3]);
+  const sf = str.match(/^(\d+)\/(\d+)/);
+  if (sf) return parseInt(sf[1])/parseInt(sf[2]);
+  const n = str.match(/^(\d+(\.\d+)?)/);
+  if (n) return parseFloat(n[1]);
+  return null;
+}
+
+function toFraction(val) {
+  if (val === 0) return '0';
+  const whole = Math.floor(val);
+  const dec = val - whole;
+  const fracs = [[1,2,'½'],[1,3,'⅓'],[2,3,'⅔'],[1,4,'¼'],[3,4,'¾'],[1,8,'⅛'],[3,8,'⅜'],[5,8,'⅝'],[7,8,'⅞'],[1,6,'⅙'],[5,6,'⅚']];
+  let best = null, bestDiff = 0.05;
+  for (const [n,d,sym] of fracs) {
+    const diff = Math.abs(dec - n/d);
+    if (diff < bestDiff) { best = sym; bestDiff = diff; }
+  }
+  if (Math.abs(dec) < 0.05) return whole > 0 ? String(whole) : '0';
+  if (Math.abs(dec - 1) < 0.05) return String(whole + 1);
+  if (best) return whole > 0 ? `${whole}${best}` : best;
+  const eighths = Math.round(dec * 8);
+  if (eighths === 0) return String(whole);
+  if (eighths === 8) return String(whole + 1);
+  const gcd = (a,b) => b ? gcd(b, a%b) : a;
+  const g = gcd(eighths, 8);
+  const fracStr = `${eighths/g}/${8/g}`;
+  return whole > 0 ? `${whole} ${fracStr}` : fracStr;
+}
+
+function unitLabel(u, amount) {
+  if (!u || u === '__none__') return '';
+  const plural = {'cup':'cups','tbsp':'tbsp','tsp':'tsp','oz':'oz','lb':'lbs','clove':'cloves','slice':'slices','bunch':'bunches','can':'cans','pkg':'packages','piece':'pieces','sprig':'sprigs','head':'heads','stalk':'stalks'};
+  const singular = {'cups':'cup','lbs':'lb','cloves':'clove','slices':'slice','bunches':'bunch','cans':'can','packages':'pkg','pieces':'piece','sprigs':'sprig','heads':'head','stalks':'stalk'};
+  if (amount > 1 && plural[u]) return plural[u];
+  return singular[u] || u;
+}
+
+function groupIngredients(ings) {
+  const groups = {'Produce':[],'Meat & Poultry':[],'Dairy & Eggs':[],'Pantry & Dry Goods':[],'Spices & Seasonings':[],'Sauces & Condiments':[],'Other':[]};
+  const rules = [
+    {g:'Produce',terms:['lettuce','spinach','kale','onion','garlic','shallot','leek','tomato','pepper','bell pepper','jalapeño','chili','carrot','celery','potato','sweet potato','zucchini','squash','eggplant','broccoli','cauliflower','cabbage','mushroom','corn','pea','bean','lemon','lime','orange','apple','banana','avocado','cucumber','asparagus','beet','radish','scallion','green onion','basil','parsley','cilantro','thyme','rosemary','sage','mint','dill','chive','ginger','serrano']},
+    {g:'Meat & Poultry',terms:['chicken','beef','pork','lamb','turkey','duck','sausage','bacon','ham','steak','ground','rib','thigh','breast','wing','shrimp','salmon','tuna','cod','fish','seafood','anchovy','pancetta','prosciutto','chorizo','pepperoni','salami']},
+    {g:'Dairy & Eggs',terms:['milk','cream','butter','cheese','yogurt','egg','mozzarella','parmesan','cheddar','ricotta','brie','gouda','feta','sour cream','half and half','buttermilk','ghee','cream cheese','mascarpone']},
+    {g:'Spices & Seasonings',terms:['salt','pepper','cumin','paprika','turmeric','cinnamon','oregano','cayenne','chili powder','garlic powder','onion powder','bay leaf','curry','coriander','cardamom','nutmeg','allspice','star anise','mustard seed','fennel seed','red pepper flake','seasoning','spice','vanilla','extract']},
+    {g:'Sauces & Condiments',terms:['soy sauce','fish sauce','hot sauce','worcestershire','vinegar','ketchup','mayo','mayonnaise','mustard','honey','maple syrup','molasses','tahini','sriracha','hoisin','oyster sauce','teriyaki','barbecue','bbq','ranch','balsamic','mirin','sake']},
+    {g:'Pantry & Dry Goods',terms:['flour','sugar','oil','olive oil','rice','pasta','bread','panko','breadcrumb','stock','broth','coconut milk','sauce','paste','lentil','chickpea','oat','quinoa','cornstarch','baking','yeast','noodle','tortilla','nut','almond','walnut','pecan','cashew','peanut','sesame','seed','raisin','chocolate','cocoa','syrup','jam','peanut butter','bouillon']},
+  ];
+  ings.forEach(ing => {
+    const lower = ing.toLowerCase();
+    let placed = false;
+    for (const {g,terms} of rules) {
+      if (terms.some(t => lower.includes(t))) { groups[g].push(ing); placed=true; break; }
+    }
+    if (!placed) groups['Other'].push(ing);
+  });
+  Object.keys(groups).forEach(k => { if (!groups[k].length) delete groups[k]; });
+  return groups;
 }
 
 initAuth();
