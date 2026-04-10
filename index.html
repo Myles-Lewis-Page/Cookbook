@@ -134,10 +134,6 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
 @media(max-width:600px){.ing-row{grid-template-columns:70px 90px 1fr 28px}}
 .rmx{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .rmx:hover{border-color:#fca5a5;color:#f87171;background:#fef2f2}
-.ing-tracker{font-size:12px;color:var(--muted);margin-top:10px;padding:8px 12px;background:var(--cream);border-radius:8px;line-height:1.6}
-.ing-tracker-done{color:#16a34a;background:#f0fdf4}
-.ing-tracker-pill{display:inline-block;background:var(--white);border:1px solid var(--border);border-radius:99px;padding:1px 8px;margin:2px 3px;font-size:11px;color:var(--ink)}
-.bd-m{width:5px;height:5px;border-radius:50%;background:var(--border);flex-shrink:0}
 .bselect{flex:1;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:10px 16px;font-size:14px;color:var(--ink);outline:none;font-family:'DM Sans',sans-serif;min-width:0}
 .bselect:focus{border-color:var(--accent)}
 .binput{flex:1;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:10px 16px;font-size:14px;color:var(--ink);outline:none;font-family:'DM Sans',sans-serif;min-width:0}
@@ -702,8 +698,8 @@ function renderSI(id){
   c.innerHTML=s.ingredients.map((v,i)=>{
     const used=getUsedIngredients(id,i);
     const available=filled.filter(f=>!used.has(f)||f===v);
-    return `<div class="birow"><div class="bd-m"></div><select class="bselect step-ing-sel" onchange="updateSI(${id},${i},this.value)">${!v&&available.length===0?"<option value=\"\">All ingredients assigned</option>":"<option value=\"\">Select ingredient</option>"+available.map(f=>`<option value="${esc(f)}"${f===v?" selected":""}>${esc(f)}</option>`).join("")}</select><button class="rmx" onclick="removeSI(${id},${i})">x</button></div>`;
-  }).join("")+renderIngTracker(id,filled,false);
+    return `<div class="birow"><select class="bselect step-ing-sel" onchange="updateSI(${id},${i},this.value)">${!v&&available.length===0?"<option value=\"\">All ingredients assigned</option>":"<option value=\"\">Select ingredient</option>"+available.map(f=>`<option value="${esc(f)}"${f===v?" selected":""}>${esc(f)}</option>`).join("")}</select><button class="rmx" onclick="removeSI(${id},${i})">x</button></div>`;
+  }).join("");
 }
 
 function getUsedIngredients(excludeStepId, excludeIngIdx){
@@ -725,23 +721,6 @@ function getEUsedIngredients(excludeStepId, excludeIngIdx){
   return used;
 }
 
-function allIngsUsed(filled){
-  const used=new Set();
-  steps.forEach(s=>s.ingredients.forEach(v=>{if(v)used.add(v)}));
-  return filled.length>0 && filled.every(f=>used.has(f));
-}
-function allEIngsUsed(filled){
-  const used=new Set();
-  editSteps.forEach(s=>s.ingredients.forEach(v=>{if(v)used.add(v)}));
-  return filled.length>0 && filled.every(f=>used.has(f));
-}
-
-function renderIngTracker(stepId, filled, isEdit){
-  if(!filled.length) return '';
-  const done = isEdit ? allEIngsUsed(filled) : allIngsUsed(filled);
-  if(done) return `<div class="ing-tracker ing-tracker-done">✓ All ingredients accounted for</div>`;
-  return '';
-}
 
 function addSI(id){
   const s=steps.find(s=>s.id===id);
@@ -771,7 +750,7 @@ function updateESI(id,i,v){
 function renderSN(id){
   const s=steps.find(s=>s.id===id), c=document.getElementById('sn'+id);
   if(!s||!c) return;
-  c.innerHTML=s.instructions.map((v,i)=>`<div class="birow"><div class="bd-m"></div><input class="binput" type="text" placeholder="e.g. Mix until a smooth dough forms" value="${esc(v)}" oninput="updateSN(${id},${i},this.value)"/><button class="rmx" onclick="removeSN(${id},${i})">×</button></div>`).join('');
+  c.innerHTML=s.instructions.map((v,i)=>`<div class="birow"><input class="binput" type="text" placeholder="e.g. Mix until a smooth dough forms" value="${esc(v)}" oninput="updateSN(${id},${i},this.value)"/><button class="rmx" onclick="removeSN(${id},${i})">×</button></div>`).join('');
 }
 
 function addSN(id){
@@ -994,14 +973,14 @@ function renderESI(id){
   c.innerHTML=s.ingredients.map((v,i)=>{
     const used=getEUsedIngredients(id,i);
     const available=filled.filter(f=>!used.has(f)||f===v);
-    return `<div class="birow"><div class="bd-m"></div><select class="bselect estep-ing-sel" onchange="updateESI(${id},${i},this.value)">${!v&&available.length===0?`<option value="">All ingredients assigned</option>`:`<option value="">Select ingredient</option>`+available.map(f=>`<option value="${esc(f)}"${f===v?' selected':''}>${esc(f)}</option>`).join('')}</select><button class="rmx" onclick="removeESI(${id},${i})">×</button></div>`;
-  }).join('')+renderIngTracker(id,filled,true);
+    return `<div class="birow"><select class="bselect estep-ing-sel" onchange="updateESI(${id},${i},this.value)">${!v&&available.length===0?`<option value="">All ingredients assigned</option>`:`<option value="">Select ingredient</option>`+available.map(f=>`<option value="${esc(f)}"${f===v?' selected':''}>${esc(f)}</option>`).join('')}</select><button class="rmx" onclick="removeESI(${id},${i})">×</button></div>`;
+  }).join('');
 }
 
 function renderESN(id){
   const s=editSteps.find(s=>s.id===id), c=document.getElementById('esn'+id);
   if(!s||!c) return;
-  c.innerHTML=s.instructions.map((v,i)=>`<div class="birow"><div class="bd-m"></div><input class="binput" type="text" value="${esc(v)}" placeholder="e.g. Mix until a smooth dough forms" oninput="updateESN(${id},${i},this.value)"/><button class="rmx" onclick="removeESN(${id},${i})">×</button></div>`).join('');
+  c.innerHTML=s.instructions.map((v,i)=>`<div class="birow"><input class="binput" type="text" value="${esc(v)}" placeholder="e.g. Mix until a smooth dough forms" oninput="updateESN(${id},${i},this.value)"/><button class="rmx" onclick="removeESN(${id},${i})">×</button></div>`).join('');
 }
 function addESN(id){const s=editSteps.find(s=>s.id===id);if(s){s.instructions.push('');renderESN(id);const ins=document.querySelectorAll(`#esn${id} .binput`);ins[ins.length-1]?.focus()}}
 function removeESN(id,i){const s=editSteps.find(s=>s.id===id);if(s){s.instructions.splice(i,1);renderESN(id)}}
