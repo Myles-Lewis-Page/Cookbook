@@ -807,12 +807,15 @@ function parseTimeParts(v){
 
 function parseRecipeCard(text){
   const lines=text.split(/\r?\n/).map(l=>l.trim());
-  const isDiv=l=>/^[\u2013\u2014\-_=]{5,}$/.test(l);
-  const isBullet=l=>/^[*\u2022\-]\s+/.test(l);
+  const isDiv=l=>/^[\u2013\u2014\u2012\-_=\u2500]{5,}$/.test(l);
+  const strip=l=>l.replace(/^[*\u2022\u25CF\u25E6\-]\s*/,'').trim();
+  const isCaps=l=>/[A-Z]/.test(l) && l===l.toUpperCase();
   const out={title:'',prep:'',cook:'',serv:'',all:[],sections:[]};
   let state='head', mode=null, cur=null;
-  for(const l of lines){
-    if(!l || isDiv(l)) continue;
+  for(const raw of lines){
+    if(!raw || isDiv(raw)) continue;
+    const l=strip(raw);
+    if(!l) continue;
     if(state==='head'){
       let m;
       if(/^all ingredients$/i.test(l)){state='all';continue;}
@@ -824,22 +827,13 @@ function parseRecipeCard(text){
     }
     if(state==='all'){
       if(/^recipe$/i.test(l)){state='recipe';continue;}
-      if(isBullet(l)) out.all.push(parseIngLine(l));
-      continue;
-    }
-    if(isBullet(l)){
-      if(!cur) continue;
-      const t=l.replace(/^[*\u2022\-]\s+/,'').trim();
-      if(mode==='ing') cur.ingredients.push(t); else if(mode==='ins') cur.instructions.push(t);
+      out.all.push(parseIngLine(l));
       continue;
     }
     if(/^ingredients used$/i.test(l)){mode='ing';continue;}
     if(/^instructions$/i.test(l)){mode='ins';continue;}
-    if(mode==='ins' && cur && l!==l.toUpperCase()){
-      const n=cur.instructions.length;
-      if(n) cur.instructions[n-1]+=' '+l; else cur.instructions.push(l);
-      continue;
-    }
+    if(mode==='ing'){ if(cur) cur.ingredients.push(l); continue; }
+    if(mode==='ins' && !isCaps(l)){ if(cur) cur.instructions.push(l); continue; }
     cur={title:l,ingredients:[],instructions:[]}; out.sections.push(cur); mode=null;
   }
   return out;
