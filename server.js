@@ -33,6 +33,7 @@ async function initDB() {
       steps JSONB NOT NULL DEFAULT '[]',
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
+    ALTER TABLE recipes ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'cookbook';
     CREATE TABLE IF NOT EXISTS ingredients (
       id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
       name TEXT NOT NULL UNIQUE,
@@ -55,6 +56,8 @@ function requireAdmin(req, res, next) {
   res.status(401).json({ error: 'Unauthorized' });
 }
 
+const STATUSES = ['cookbook', 'want_to_try', 'hated'];
+
 // AUTH
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
@@ -71,7 +74,7 @@ app.get('/api/auth/me', (req, res) => { res.json({ isAdmin: !!req.session?.isAdm
 // RECIPES
 app.get('/api/recipes/counts', async (req, res) => {
   try {
-    const r = await pool.query('SELECT category, COUNT(*) as count FROM recipes GROUP BY category');
+    const r = await pool.query("SELECT category, COUNT(*) as count FROM recipes WHERE status='cookbook' GROUP BY category");
     const counts = {};
     r.rows.forEach(row => { counts[row.category] = parseInt(row.count); });
     res.json(counts);
@@ -80,7 +83,7 @@ app.get('/api/recipes/counts', async (req, res) => {
 
 app.get('/api/recipes/recent', async (req, res) => {
   try {
-    const r = await pool.query('SELECT id,title,category,created_at FROM recipes ORDER BY created_at DESC LIMIT 6');
+    const r = await pool.query("SELECT id,title,category,created_at FROM recipes WHERE status='cookbook' ORDER BY created_at DESC LIMIT 6");
     res.json(r.rows);
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
@@ -88,9 +91,9 @@ app.get('/api/recipes/recent', async (req, res) => {
 app.get('/api/recipes/all', async (req, res) => {
   try {
     const { categories } = req.query;
-    let q = 'SELECT id,title,category,all_ingredients,steps FROM recipes';
+    let q = "SELECT id,title,category,all_ingredients,steps FROM recipes WHERE status='cookbook'";
     const params = [];
-    if (categories) { q += ' WHERE category = ANY($1)'; params.push(categories.split(',').map(c=>c.trim())); }
+    if (categories) { q += ' AND category = ANY($1)'; params.push(categories.split(',').map(c=>c.trim())); }
     q += ' ORDER BY title ASC';
     const r = await pool.query(q, params);
     res.json(r.rows);
@@ -101,7 +104,7 @@ app.get('/api/recipes/batch', async (req, res) => {
   try {
     const ids = (req.query.ids||'').split(',').filter(Boolean);
     if (!ids.length) return res.json([]);
-    const r = await pool.query('SELECT id,title,category,all_ingredients FROM recipes WHERE id = ANY($1)', [ids]);
+    const r = await pool.query("SELECT id,title,category,all_ingredients FROM recipes WHERE id = ANY($1) AND status='cookbook'", [ids]);
     res.json(r.rows);
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
@@ -110,6 +113,7 @@ app.get('/api/recipes/:id', async (req, res) => {
   try {
     const r = await pool.query('SELECT * FROM recipes WHERE id=$1', [req.params.id]);
     if (!r.rows.length) return res.status(404).json({ error: 'Not found' });
+    if (r.rows[0].status === 'hated' && !req.session?.isAdmin) return res.status(404).json({ error: 'Not found' });
     res.json(r.rows[0]);
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
@@ -117,9 +121,12 @@ app.get('/api/recipes/:id', async (req, res) => {
 app.get('/api/recipes', async (req, res) => {
   try {
     const { category } = req.query;
-    let q = 'SELECT id,title,category,prep_time,cook_time,servings,all_ingredients,created_at FROM recipes';
-    const params = [];
-    if (category) { q += ' WHERE category=$1'; params.push(category); }
+    const status = req.query.status || 'cookbook';
+    if (!STATUSES.includes(status)) return res.status(400).json({ error: 'Bad status' });
+    if (status === 'hated' && !req.session?.isAdmin) return res.status(401).json({ error: 'Unauthorized' });
+    let q = 'SELECT id,title,category,status,prep_time,cook_time,servings,all_ingredients,created_at FROM recipes WHERE status=$1';
+    const params = [status];
+    if (category) { q += ' AND category=$2'; params.push(category); }
     q += ' ORDER BY title ASC';
     const r = await pool.query(q, params);
     res.json(r.rows);
@@ -129,11 +136,23 @@ app.get('/api/recipes', async (req, res) => {
 app.post('/api/recipes', requireAdmin, async (req, res) => {
   try {
     const { title, category, prep_time, cook_time, servings, all_ingredients, steps } = req.body;
+    const status = req.body.status || 'cookbook';
     if (!title||!category) return res.status(400).json({ error: 'Missing fields' });
+    if (!STATUSES.includes(status)) return res.status(400).json({ error: 'Bad status' });
     const r = await pool.query(
-      'INSERT INTO recipes (title,category,prep_time,cook_time,servings,all_ingredients,steps) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *',
-      [title, category, prep_time, cook_time, servings, JSON.stringify(all_ingredients), JSON.stringify(steps)]
+      'INSERT INTO recipes (title,category,prep_time,cook_time,servings,all_ingredients,steps,status) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *',
+      [title, category, prep_time, cook_time, servings, JSON.stringify(all_ingredients), JSON.stringify(steps), status]
     );
+    res.json(r.rows[0]);
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.put('/api/recipes/:id/status', requireAdmin, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!STATUSES.includes(status)) return res.status(400).json({ error: 'Bad status' });
+    const r = await pool.query('UPDATE recipes SET status=$1 WHERE id=$2 RETURNING id,category,status', [status, req.params.id]);
+    if (!r.rows.length) return res.status(404).json({ error: 'Not found' });
     res.json(r.rows[0]);
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
