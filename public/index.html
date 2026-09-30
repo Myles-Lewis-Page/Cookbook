@@ -359,6 +359,15 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
   <div class="add-wrap">
     <h1>Add recipe</h1>
     <p class="sub">Add all ingredients first — you'll select them per step below.</p>
+    <div class="slabel">Import from recipe card</div>
+    <div class="card" id="import-card">
+      <div class="fgroup">
+        <label class="flabel">Paste a formatted recipe card</label>
+        <textarea class="finput" id="imp-text" rows="8" placeholder="Paste the recipe card text here, then tap Fill form. You can review everything before saving."></textarea>
+      </div>
+      <button class="btn-edit" type="button" onclick="importRecipeCard()">Fill form from card</button>
+      <p id="imp-msg" style="font-size:13px;color:var(--muted);margin-top:10px"></p>
+    </div>
     <div class="slabel">Recipe info</div>
     <div class="card">
       <div class="fgroup"><label class="flabel">Recipe title</label><input class="finput" type="text" id="r-title" placeholder="e.g. French Bread"/></div>
@@ -776,6 +785,94 @@ function addSN(id){
 }
 function removeSN(id,i){const s=steps.find(s=>s.id===id);if(s){s.instructions.splice(i,1);renderSN(id)}}
 function updateSN(id,i,v){const s=steps.find(s=>s.id===id);if(s)s.instructions[i]=v}
+
+// ── IMPORT FROM RECIPE CARD ───────────────────────────────────────────────────
+function parseIngLine(line){
+  const s=line.replace(/^\s*(?:[*\u2022\-]\s+)/,'').trim();
+  const m=s.match(/^(\d+\s*[¼½¾⅓⅔⅛⅜⅝⅞]|\d+\s+\d+\/\d+|\d+\/\d+|[¼½¾⅓⅔⅛⅜⅝⅞]|\d+(?:\.\d+)?(?:\s*[-\u2013]\s*\d+(?:\.\d+)?)?)\s*(.*)$/);
+  if(!m) return {amount:'',unit:'',name:s};
+  let amount=m[1].replace(/\s+/g,' ').trim(), rest=m[2].trim(), unit='';
+  const first=(rest.split(/\s+/)[0]||'');
+  const hit=UNITS.find(u=>u && u.toLowerCase()===first.toLowerCase());
+  if(hit){unit=hit; rest=rest.slice(first.length).trim();}
+  return {amount, unit, name:rest||s};
+}
+
+function parseTimeParts(v){
+  if(!v || /not listed/i.test(v)) return {h:'',m:''};
+  const h=(v.match(/(\d+)\s*h/i)||[])[1]||'';
+  const m=(v.match(/(\d+)\s*m/i)||[])[1]||'';
+  return {h,m};
+}
+
+function parseRecipeCard(text){
+  const lines=text.split(/\r?\n/).map(l=>l.trim());
+  const isDiv=l=>/^[\u2013\u2014\-_=]{5,}$/.test(l);
+  const isBullet=l=>/^[*\u2022\-]\s+/.test(l);
+  const out={title:'',prep:'',cook:'',serv:'',all:[],sections:[]};
+  let state='head', mode=null, cur=null;
+  for(const l of lines){
+    if(!l || isDiv(l)) continue;
+    if(state==='head'){
+      let m;
+      if(/^all ingredients$/i.test(l)){state='all';continue;}
+      if((m=l.match(/^prep time:\s*(.*)$/i))){out.prep=m[1];continue;}
+      if((m=l.match(/^cook time:\s*(.*)$/i))){out.cook=m[1];continue;}
+      if((m=l.match(/^servings:\s*(.*)$/i))){out.serv=/not listed/i.test(m[1])?'':m[1];continue;}
+      if(!out.title) out.title=l;
+      continue;
+    }
+    if(state==='all'){
+      if(/^recipe$/i.test(l)){state='recipe';continue;}
+      if(isBullet(l)) out.all.push(parseIngLine(l));
+      continue;
+    }
+    if(isBullet(l)){
+      if(!cur) continue;
+      const t=l.replace(/^[*\u2022\-]\s+/,'').trim();
+      if(mode==='ing') cur.ingredients.push(t); else if(mode==='ins') cur.instructions.push(t);
+      continue;
+    }
+    if(/^ingredients used$/i.test(l)){mode='ing';continue;}
+    if(/^instructions$/i.test(l)){mode='ins';continue;}
+    if(mode==='ins' && cur && l!==l.toUpperCase()){
+      const n=cur.instructions.length;
+      if(n) cur.instructions[n-1]+=' '+l; else cur.instructions.push(l);
+      continue;
+    }
+    cur={title:l,ingredients:[],instructions:[]}; out.sections.push(cur); mode=null;
+  }
+  return out;
+}
+
+function importRecipeCard(){
+  const msg=document.getElementById('imp-msg');
+  const text=document.getElementById('imp-text').value;
+  if(!text.trim()){msg.textContent='Paste a recipe card first.';return;}
+  const r=parseRecipeCard(text);
+  if(!r.title||!r.all.length){msg.textContent='Could not find a title and an ALL INGREDIENTS list. Check the pasted text.';return;}
+  document.getElementById('r-title').value=r.title;
+  const pt=parseTimeParts(r.prep), ct=parseTimeParts(r.cook);
+  document.getElementById('r-prep-h').value=pt.h;
+  document.getElementById('r-prep-m').value=pt.m;
+  document.getElementById('r-cook-h').value=ct.h;
+  document.getElementById('r-cook-m').value=ct.m;
+  document.getElementById('r-serv').value=r.serv;
+  masterIngs=r.all;
+  renderMI();
+  steps=[]; stepCount=0;
+  document.getElementById('sc').innerHTML='';
+  r.sections.forEach(sec=>{
+    const id=++stepCount;
+    const ings=sec.ingredients.map(t=>ingToString(parseIngLine(t)));
+    steps.push({id,title:sec.title,ingredients:ings.length?ings:[''],instructions:sec.instructions.length?sec.instructions:['']});
+    renderStep(id);
+    const ti=document.querySelector('#sc'+id+' input.finput');
+    if(ti) ti.value=sec.title;
+  });
+  if(!steps.length) addStep();
+  msg.textContent='Form filled. Pick a category, check the details below, then tap Save recipe.';
+}
 
 async function saveRecipe(){
   const err=document.getElementById('serr');
