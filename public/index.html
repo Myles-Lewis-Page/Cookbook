@@ -175,6 +175,9 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
 .print-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink)}
 .print-btn:hover{border-color:var(--ink)}
 @media print{nav,.back-btn,.plan-section,.save-btn,.print-btn{display:none!important}.shopping-section{display:block!important}}
+.try-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:56px}
+.status-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.status-badge{display:inline-block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--cream);border:1px solid var(--border);padding:3px 10px;border-radius:99px;margin-bottom:12px}
 </style>
 </head>
 <body>
@@ -194,6 +197,10 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
     </div>
     <div class="slabel">Browse by category</div>
     <div class="cat-grid" id="cat-grid"></div>
+    <div id="try-wrap" style="display:none">
+      <div class="slabel">To try</div>
+      <div class="try-grid" id="try-grid"></div>
+    </div>
     <div id="recent-wrap" style="display:none">
       <div class="slabel">Recently added</div>
       <div class="recent-list" id="recent-list"></div>
@@ -211,14 +218,27 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
   </main>
 </div>
 
+<div id="page-status" class="page">
+  <main>
+    <button class="back-btn" onclick="showPage('home')">← Back</button>
+    <div class="cat-hdr"><span class="cat-hdr-icon" id="st-icon"></span><h1 id="st-title"></h1></div>
+    <p class="cat-sub" id="st-sub"></p>
+    <div class="accent-line"></div>
+    <div style="margin-bottom:8px"><button class="btn-edit" id="st-add" onclick="startAddToTry()">+ Add a recipe to try</button></div>
+    <div class="recipe-list" id="st-list"></div>
+  </main>
+</div>
+
 <div id="page-recipe" class="page">
   <div class="narrow">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
       <button class="back-btn" id="rbk" style="margin-bottom:0">← Back</button>
       <button class="btn-edit" id="edit-btn" style="display:none" onclick="openEdit()">Edit recipe</button>
     </div>
+    <div class="status-badge" id="status-badge" style="display:none"></div>
     <h1 class="recipe-title" id="rt"></h1>
-    <div class="recipe-meta" id="rm" style="margin-bottom:32px"></div>
+    <div class="recipe-meta" id="rm" style="margin-bottom:24px"></div>
+    <div class="status-actions" id="status-actions" style="display:none"></div>
     <hr class="divider"/>
     <div class="sec-title">All Ingredients</div>
     <hr class="divider" style="margin-top:0"/>
@@ -378,6 +398,12 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
           <option>Entrees</option><option>Breads &amp; Baked</option><option>Sauces &amp; Marinades</option><option>Seasonings</option><option>Desserts</option>
         </select>
       </div>
+      <div class="fgroup"><label class="flabel">Save to</label>
+        <select class="fselect" id="r-status">
+          <option value="cookbook">My cookbook</option>
+          <option value="want_to_try">Want to try</option>
+        </select>
+      </div>
       <div class="g3">
         <div class="fgroup"><label class="flabel">Prep time</label><div class="time-input"><input class="finput time-h" type="number" id="r-prep-h" min="0" max="23" placeholder="00"/><span class="time-sep">H</span><input class="finput time-m" type="number" id="r-prep-m" min="0" max="59" placeholder="00"/><span class="time-sep">M</span></div></div>
         <div class="fgroup"><label class="flabel">Cook time</label><div class="time-input"><input class="finput time-h" type="number" id="r-cook-h" min="0" max="23" placeholder="00"/><span class="time-sep">H</span><input class="finput time-m" type="number" id="r-cook-m" min="0" max="59" placeholder="00"/><span class="time-sep">M</span></div></div>
@@ -410,13 +436,18 @@ async function api(path, opts={}) {
   return {data, error: res.ok ? null : data};
 }
 
-let user = null, curCat = null, stepCount = 0;
+let user = null, curCat = null, stepCount = 0, currentRecipeStatus = 'cookbook';
 let currentRecipeId=null, currentRecipeCat=null, currentRecipePrepTime=null, currentRecipeCookTime=null, currentRecipeServings=null, currentRecipeIngs=[], currentRecipeSteps=[];
 
 const CATS = {
   'Breakfast':{'icon':'🍳'},'Sides':{'icon':'🥗'},'Lunch':{'icon':'🥪'},
   'Entrees':{'icon':'🍽️'},'Breads & Baked':{'icon':'🍞'},
   'Sauces & Marinades':{'icon':'🫙'},'Seasonings':{'icon':'🧂'},'Desserts':{'icon':'🍰'}
+};
+
+const STATUS_INFO = {
+  want_to_try:{label:'Want to try', icon:'🔖', sub:'Recipes saved to try later'},
+  hated:{label:'Tried but hated', icon:'👎', sub:'Recipes that did not make the cut'}
 };
 
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
@@ -439,6 +470,7 @@ async function initAuth(){
 
 function renderNav(){
   const nr = document.getElementById('nav-right');
+  if(document.getElementById('page-home').classList.contains('active')) loadTryCards();
   nr.innerHTML = user
     ? `<button class="nav-btn nav-btn-outline" onclick="showPage('plan')">Weekly plan</button><button class="nav-btn nav-btn-outline" onclick="showPage('make')">What should I make?</button><button class="nav-btn nav-btn-outline" onclick="showPage('suggestions')">Suggestions</button><button class="nav-btn nav-btn-fill" onclick="resetForm();showPage('add')">+ Add Recipe</button><button class="nav-btn nav-btn-ghost" onclick="doSignOut()">Sign out</button>`
     : `<button class="nav-btn nav-btn-outline" onclick="showPage('plan')">Weekly plan</button><button class="nav-btn nav-btn-outline" onclick="showPage('make')">What should I make?</button><button class="nav-btn nav-btn-outline" onclick="showPage('suggest')">Suggest a recipe</button><button class="nav-btn nav-btn-ghost" onclick="showPage('login')">Admin</button>`;
@@ -456,6 +488,7 @@ async function doLogin(){
 async function doSignOut(){await api('/auth/logout',{method:'POST'});user=null;renderNav();showPage('home');}
 
 async function loadHome(){
+  loadTryCards();
   // Render categories immediately without waiting for counts
   document.getElementById('cat-grid').innerHTML = Object.entries(CATS).map(([name,{icon}])=>`
     <button class="cat-card" onclick="loadCat('${esc(name)}')">
@@ -484,6 +517,66 @@ async function loadHome(){
       rl.innerHTML=recent.map(r=>`<div class="recent-item" onclick="loadRecipe('${r.id}','${esc(r.category)}')"><span class="rtitle">${esc(r.title)}</span><span class="tag">${esc(r.category)}</span></div>`).join('');
     } else { rw.style.display='none'; }
   } catch(e) { console.error('loadHome recent error:', e); }
+}
+
+async function loadTryCards(){
+  const wrap=document.getElementById('try-wrap'), grid=document.getElementById('try-grid');
+  wrap.style.display='block';
+  const keys=Object.keys(STATUS_INFO).filter(k=>user||k==='want_to_try');
+  grid.innerHTML=keys.map(k=>[k,STATUS_INFO[k]]).map(([key,{label,icon}])=>`
+    <button class="cat-card" onclick="loadStatusList('${key}')">
+      <div class="cat-icon">${icon}</div>
+      <div class="cat-name">${label}</div>
+      <div class="cat-count" id="try-count-${key}">...</div>
+    </button>`).join('');
+  for(const key of keys){
+    const {data}=await api('/recipes?status='+key);
+    const el=document.getElementById('try-count-'+key);
+    if(el && Array.isArray(data)) el.textContent=`${data.length} ${data.length===1?'recipe':'recipes'}`;
+  }
+}
+
+async function loadStatusList(status){
+  if(!user && status!=='want_to_try'){showPage('home');return;}
+  const info=STATUS_INFO[status];
+  document.getElementById('st-icon').textContent=info.icon;
+  document.getElementById('st-title').textContent=info.label;
+  document.getElementById('st-add').style.display=(user&&status==='want_to_try')?'inline-block':'none';
+  const {data:recipes}=await api('/recipes?status='+status);
+  const list=Array.isArray(recipes)?recipes:[];
+  document.getElementById('st-sub').textContent=`${list.length} ${list.length===1?'recipe':'recipes'} · ${info.sub}`;
+  document.getElementById('st-list').innerHTML=!list.length
+    ? `<div class="empty">Nothing here yet.</div>`
+    : list.map(r=>`<div class="rrow" onclick="loadRecipe('${r.id}','${status}')">
+        <div><div class="rrow-title">${esc(r.title)}</div><div class="rrow-meta">${esc(r.category)}</div></div>
+        <span class="arr">→</span></div>`).join('');
+  showPage('status');
+}
+
+function startAddToTry(){
+  resetForm();
+  document.getElementById('r-status').value='want_to_try';
+  showPage('add');
+}
+
+function renderStatusActions(){
+  const box=document.getElementById('status-actions'), badge=document.getElementById('status-badge');
+  const st=currentRecipeStatus;
+  if(st!=='cookbook'){badge.style.display='inline-block';badge.textContent=STATUS_INFO[st].label;}
+  else badge.style.display='none';
+  if(!user){box.style.display='none';return;}
+  const btn=(label,target)=>`<button class="btn-edit" onclick="moveRecipe('${target}')">${label}</button>`;
+  const buttons = st==='want_to_try' ? btn('Move to my cookbook','cookbook')+btn('Tried it, hated it','hated')
+                : st==='hated'       ? btn('Move to my cookbook','cookbook')+btn('Back to want to try','want_to_try')
+                :                      btn('Move to tried but hated','hated');
+  box.innerHTML=buttons; box.style.display='flex';
+}
+
+async function moveRecipe(newStatus){
+  const {error}=await api('/recipes/'+currentRecipeId+'/status',{method:'PUT',body:{status:newStatus}});
+  if(error){alert('Could not move this recipe. Please try again.');return;}
+  if(newStatus==='cookbook') loadRecipe(currentRecipeId, currentRecipeCat);
+  else loadStatusList(newStatus);
 }
 
 async function loadCat(name){
@@ -516,8 +609,11 @@ async function loadRecipe(id, fromCat){
   currentRecipeIngs=[...(r.all_ingredients||[])];
   currentRecipeSteps=(r.steps||[]).map((s,i)=>({...s,id:i+1}));
   const rbk=document.getElementById('rbk');
-  rbk.textContent=`← ${fromCat||r.category}`;
-  rbk.onclick=()=>fromCat?loadCat(fromCat):showPage('home');
+  currentRecipeStatus=r.status||'cookbook';
+  if(currentRecipeStatus!=='cookbook') fromCat=currentRecipeStatus;
+  rbk.textContent=`← ${STATUS_INFO[fromCat]?STATUS_INFO[fromCat].label:(fromCat||r.category)}`;
+  rbk.onclick=()=>STATUS_INFO[fromCat]?loadStatusList(fromCat):(fromCat?loadCat(fromCat):showPage('home'));
+  renderStatusActions();
   const editBtn=document.getElementById('edit-btn');
   editBtn.style.display=user?'block':'none';
   document.getElementById('rt').textContent=r.title;
@@ -644,6 +740,7 @@ function resetForm(){
   document.getElementById('r-cook-h').value='';
   document.getElementById('r-cook-m').value='';
   document.getElementById('r-serv').value='';
+  document.getElementById('r-status').value='cookbook';
   document.getElementById('serr').textContent='';
   masterIngs=[{amount:'',unit:'',name:''},{amount:'',unit:'',name:''}];
   steps=[]; stepCount=0;
@@ -882,7 +979,7 @@ async function saveRecipe(){
   // Save new ingredients to DB
   await Promise.all(filled.map(i => ensureIngredient(i.name)));
   const {data,error} = await api('/recipes', {method:'POST', body:{
-    title:title.toUpperCase(), category,
+    title:title.toUpperCase(), category, status:document.getElementById('r-status').value,
     prep_time:buildTime(document.getElementById('r-prep-h').value, document.getElementById('r-prep-m').value),
     cook_time:buildTime(document.getElementById('r-cook-h').value, document.getElementById('r-cook-m').value),
     servings:document.getElementById('r-serv').value.trim(),
