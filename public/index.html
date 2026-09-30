@@ -218,13 +218,43 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
   </main>
 </div>
 
+<div id="page-bulk" class="page">
+  <div class="add-wrap">
+    <button class="back-btn" onclick="showPage('add')">← Back</button>
+    <h1>Bulk import</h1>
+    <p class="sub">Paste as many recipe cards as you like, one after another. Each card must start with its title followed by the Prep Time line.</p>
+    <div class="card">
+      <div class="fgroup"><label class="flabel">Recipe cards</label>
+        <textarea class="finput" id="bulk-text" rows="14" placeholder="Paste all your recipe cards here"></textarea>
+      </div>
+      <div class="fgroup"><label class="flabel">Category for all (a card's own Category line overrides this)</label>
+        <select class="fselect" id="bulk-cat">
+          <option value="">Select a category</option>
+          <option>Breakfast</option><option>Sides</option><option>Lunch</option>
+          <option>Entrees</option><option>Breads &amp; Baked</option><option>Sauces &amp; Marinades</option><option>Seasonings</option><option>Desserts</option>
+        </select>
+      </div>
+      <div class="fgroup"><label class="flabel">Save to</label>
+        <select class="fselect" id="bulk-status">
+          <option value="cookbook">My cookbook</option>
+          <option value="want_to_try">Want to try</option>
+        </select>
+      </div>
+      <button class="btn-edit" type="button" onclick="bulkPreview()">Preview</button>
+      <p id="bulk-msg" style="font-size:13px;color:var(--muted);margin-top:10px"></p>
+      <div id="bulk-list"></div>
+      <button class="save-btn" id="bulk-save" type="button" style="display:none;margin-top:16px" onclick="bulkSave()">Save all</button>
+    </div>
+  </div>
+</div>
+
 <div id="page-status" class="page">
   <main>
     <button class="back-btn" onclick="showPage('home')">← Back</button>
     <div class="cat-hdr"><span class="cat-hdr-icon" id="st-icon"></span><h1 id="st-title"></h1></div>
     <p class="cat-sub" id="st-sub"></p>
     <div class="accent-line"></div>
-    <div style="margin-bottom:8px"><button class="btn-edit" id="st-add" onclick="startAddToTry()">+ Add a recipe to try</button></div>
+    <div style="margin-bottom:8px"><button class="btn-edit" id="st-add" onclick="startAddToTry()">+ Add a recipe to try</button> <button class="btn-edit" id="st-bulk" onclick="openBulk('want_to_try')">Import many at once</button></div>
     <div class="recipe-list" id="st-list"></div>
   </main>
 </div>
@@ -386,6 +416,7 @@ main{max-width:960px;margin:0 auto;padding:48px 24px 80px}
         <textarea class="finput" id="imp-text" rows="8" placeholder="Paste the recipe card text here, then tap Fill form. You can review everything before saving."></textarea>
       </div>
       <button class="btn-edit" type="button" onclick="importRecipeCard()">Fill form from card</button>
+      <button class="btn-edit" type="button" onclick="openBulk('cookbook')">Import many at once</button>
       <p id="imp-msg" style="font-size:13px;color:var(--muted);margin-top:10px"></p>
     </div>
     <div class="slabel">Recipe info</div>
@@ -542,6 +573,7 @@ async function loadStatusList(status){
   document.getElementById('st-icon').textContent=info.icon;
   document.getElementById('st-title').textContent=info.label;
   document.getElementById('st-add').style.display=(user&&status==='want_to_try')?'inline-block':'none';
+  document.getElementById('st-bulk').style.display=(user&&status==='want_to_try')?'inline-block':'none';
   const {data:recipes}=await api('/recipes?status='+status);
   const list=Array.isArray(recipes)?recipes:[];
   document.getElementById('st-sub').textContent=`${list.length} ${list.length===1?'recipe':'recipes'} · ${info.sub}`;
@@ -907,7 +939,7 @@ function parseRecipeCard(text){
   const isDiv=l=>/^[\u2013\u2014\u2012\-_=\u2500]{5,}$/.test(l);
   const strip=l=>l.replace(/^[*\u2022\u25CF\u25E6\-]\s*/,'').trim();
   const isCaps=l=>/[A-Z]/.test(l) && l===l.toUpperCase();
-  const out={title:'',prep:'',cook:'',serv:'',all:[],sections:[]};
+  const out={title:'',prep:'',cook:'',serv:'',category:'',all:[],sections:[]};
   let state='head', mode=null, cur=null;
   for(const raw of lines){
     if(!raw || isDiv(raw)) continue;
@@ -918,6 +950,7 @@ function parseRecipeCard(text){
       if(/^all ingredients$/i.test(l)){state='all';continue;}
       if((m=l.match(/^prep time:\s*(.*)$/i))){out.prep=m[1];continue;}
       if((m=l.match(/^cook time:\s*(.*)$/i))){out.cook=m[1];continue;}
+      if((m=l.match(/^category:\s*(.*)$/i))){out.category=m[1].trim();continue;}
       if((m=l.match(/^servings:\s*(.*)$/i))){out.serv=/not listed/i.test(m[1])?'':m[1];continue;}
       if(!out.title) out.title=l;
       continue;
@@ -963,6 +996,98 @@ function importRecipeCard(){
   });
   if(!steps.length) addStep();
   msg.textContent='Form filled. Pick a category, check the details below, then tap Save recipe.';
+}
+
+// ── BULK IMPORT ───────────────────────────────────────────────────────────────
+let bulkItems=[];
+
+function splitCards(text){
+  const lines=text.split(/\r?\n/).map(l=>/^\s*```/.test(l)?'':l);
+  const isDiv=l=>/^[\u2013\u2014\u2012\-_=\u2500]{5,}$/.test(l.trim());
+  const idx=[];
+  lines.forEach((l,i)=>{ if(l.trim() && !isDiv(l)) idx.push(i); });
+  const starts=[];
+  for(let k=0;k<idx.length-1;k++){
+    const cur=lines[idx[k]].trim().replace(/^[*\u2022\-]\s*/,'');
+    const nxt=lines[idx[k+1]].trim().replace(/^[*\u2022\-]\s*/,'');
+    if(/^prep time:/i.test(nxt) && !/^(prep time|cook time|servings|category):/i.test(cur)) starts.push(idx[k]);
+  }
+  return starts.map((st,i)=>lines.slice(st, i+1<starts.length?starts[i+1]:lines.length).join('\n'));
+}
+
+function cardToPayload(r, category, status){
+  const pt=parseTimeParts(r.prep), ct=parseTimeParts(r.cook);
+  return {
+    title:r.title.toUpperCase(), category, status,
+    prep_time:buildTime(pt.h,pt.m), cook_time:buildTime(ct.h,ct.m),
+    servings:r.serv||'',
+    all_ingredients:r.all.filter(i=>i.name),
+    steps:r.sections.map(sec=>({title:sec.title, ingredients:sec.ingredients.map(t=>ingToString(parseIngLine(t))), instructions:sec.instructions}))
+  };
+}
+
+function openBulk(status){
+  document.getElementById('bulk-text').value='';
+  document.getElementById('bulk-status').value=status||'cookbook';
+  document.getElementById('bulk-msg').textContent='';
+  document.getElementById('bulk-list').innerHTML='';
+  document.getElementById('bulk-save').style.display='none';
+  bulkItems=[];
+  showPage('bulk');
+}
+
+async function bulkPreview(){
+  const msg=document.getElementById('bulk-msg'), list=document.getElementById('bulk-list'), saveBtn=document.getElementById('bulk-save');
+  saveBtn.style.display='none'; list.innerHTML=''; bulkItems=[];
+  const text=document.getElementById('bulk-text').value;
+  const defCat=document.getElementById('bulk-cat').value;
+  const status=document.getElementById('bulk-status').value;
+  if(!text.trim()){msg.textContent='Paste your recipe cards first.';return;}
+  const cards=splitCards(text);
+  if(!cards.length){msg.textContent='No recipe cards found. Each card needs its title followed by a Prep Time line.';return;}
+  msg.textContent='Checking your book for duplicates...';
+  const existing=new Set();
+  for(const st of ['cookbook','want_to_try','hated']){
+    const {data}=await api('/recipes?status='+st);
+    if(Array.isArray(data)) data.forEach(x=>existing.add((x.title||'').trim().toUpperCase()));
+  }
+  cards.forEach(c=>{
+    const r=parseRecipeCard(c);
+    const title=(r.title||'').trim().toUpperCase();
+    const cat=CATS[r.category]?r.category:defCat;
+    let problem='';
+    if(!title||!r.all.length) problem='Could not read this card';
+    else if(!cat) problem='Needs a category';
+    else if(existing.has(title)) problem='Already in your book, will skip';
+    if(title) existing.add(title);
+    bulkItems.push({r,title:title||'(unreadable card)',cat,problem,
+      ok:!problem, payload:problem?null:cardToPayload(r,cat,status)});
+  });
+  const good=bulkItems.filter(b=>b.ok).length;
+  list.innerHTML=bulkItems.map(b=>`<div class="rrow" style="cursor:default"><div><div class="rrow-title">${esc(b.title)}</div><div class="rrow-meta">${b.ok?`${esc(b.cat)} · ${b.r.all.length} ingredients · ${b.r.sections.length} ${b.r.sections.length===1?'section':'sections'}`:esc(b.problem)}</div></div></div>`).join('');
+  const needCat=bulkItems.some(b=>b.problem==='Needs a category');
+  msg.textContent=`Found ${bulkItems.length} ${bulkItems.length===1?'card':'cards'}. ${good} ready to save.${needCat?' Choose a category above, then tap Preview again.':''}`;
+  if(good){saveBtn.textContent=`Save ${good} ${good===1?'recipe':'recipes'}`;saveBtn.style.display='block';}
+}
+
+async function bulkSave(){
+  const msg=document.getElementById('bulk-msg'), saveBtn=document.getElementById('bulk-save');
+  const todo=bulkItems.filter(b=>b.ok);
+  if(!todo.length) return;
+  saveBtn.disabled=true;
+  const names=[...new Set(todo.flatMap(b=>b.payload.all_ingredients.map(i=>i.name)))];
+  for(const n of names) await ensureIngredient(n);
+  let saved=0; const failed=[];
+  for(const b of todo){
+    msg.textContent=`Saving ${saved+failed.length+1} of ${todo.length}...`;
+    const {error}=await api('/recipes',{method:'POST',body:b.payload});
+    if(error) failed.push(b.title); else {saved++; b.ok=false; b.problem='Saved';}
+  }
+  saveBtn.disabled=false;
+  document.getElementById('bulk-list').innerHTML=bulkItems.map(b=>`<div class="rrow" style="cursor:default"><div><div class="rrow-title">${esc(b.title)}</div><div class="rrow-meta">${failed.includes(b.title)?'Failed to save':esc(b.problem||'')}</div></div></div>`).join('');
+  msg.textContent=`Saved ${saved} ${saved===1?'recipe':'recipes'}.${failed.length?` ${failed.length} failed: ${failed.join(', ')}. Tap Preview and Save again to retry those.`:''}`;
+  saveBtn.style.display='none';
+  if(!failed.length) document.getElementById('bulk-text').value='';
 }
 
 async function saveRecipe(){
