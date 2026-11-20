@@ -1,16 +1,20 @@
 # My Cookbook
 
+[![Live demo](https://img.shields.io/badge/Live%20demo-my--cookbook.up.railway.app-2ea44f?style=for-the-badge)](https://my-cookbook.up.railway.app)
+
 A personal recipe management app. Recipes are organized into categories (Breakfast, Sides, Lunch, Entrees, Breads & Baked, Sauces & Marinades, Seasonings, Desserts) and shown as recipe cards, with an ingredient list and step-by-step instructions grouped by section.
 
-**Live demo:** https://my-cookbook.up.railway.app
+![My Cookbook home page](docs/home.jpg)
 
 ## Features
 
 - Category-based recipe browsing with recipe cards
-- Add and edit recipes through a form, with draft/published status
+- Weekly meal plan page
+- "What should I make?" ingredient-based recipe finder
+- "Want to try" list for recipes not yet cooked
+- Add and edit recipes through an admin form, with draft/published status
 - Ingredient library shared across recipes
 - Recipe suggestions submitted and reviewed through the app
-- Login for editing, public read-only browsing
 
 ## Tech stack
 
